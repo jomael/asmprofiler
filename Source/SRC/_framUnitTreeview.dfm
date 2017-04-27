@@ -19,6 +19,7 @@ object framUnitTreeview: TframUnitTreeview
     Header.Font.Height = -11
     Header.Font.Name = 'MS Sans Serif'
     Header.Font.Style = []
+    Header.Height = 17
     Header.Options = [hoColumnResize, hoDrag, hoVisible]
     IncrementalSearch = isAll
     IncrementalSearchTimeout = 2500

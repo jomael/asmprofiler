@@ -1,10 +1,5 @@
 unit VTAccessibilityFactory;
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-// Version 4.7.0
-//
-
 // class to create IAccessibles for the tree passed into it.
 // If not already assigned, creates IAccessibles for the tree itself
 // and the focused item
@@ -16,16 +11,12 @@ unit VTAccessibilityFactory;
 //
 // Written by Marco Zehe. (c) 2007
 
-{$I Compilers.inc}
-
 interface
 
 uses
-  {$ifndef COMPILER_10_UP}
-    MSAAIntf, // MSAA support for Delphi up to 2005
-  {$else}
+  {$if CompilerVersion >= 18}
     oleacc, // MSAA support in Delphi 2006 or higher
-  {$endif COMPILER_10_UP}
+  {$ifend}
   Classes, VirtualTrees;
 
 type
@@ -50,14 +41,13 @@ implementation
 
 var
   VTAccessibleFactory: TVTAccessibilityFactory = nil;
-  AccessibilityAvailable: boolean = false;
-  
+  AccessibilityAvailable: Boolean = False;
 
 { TVTAccessibilityFactory }
 
 constructor TVTAccessibilityFactory.Create;
 begin
-  inherited;
+  inherited Create;
   FAccessibleProviders := TInterfaceList.Create;
   FAccessibleProviders.Clear;
 end;
@@ -77,15 +67,15 @@ var
 // We'll work top to bottom, from the most complicated to the most simple.
 // The index for these should all be greater than 0, e g the IAccessible for the tree itself should always be registered first, then any IAccessible items.
 begin
-  result := nil;
+  Result := nil;
   if ATree <> nil then
   begin
     if ATree.Accessible = nil then
     begin
       if FAccessibleProviders.Count > 0 then
       begin
-        result := IVTAccessibleProvider(FAccessibleProviders.Items[0]).CreateIAccessible(ATree);
-        exit;
+        Result := IVTAccessibleProvider(FAccessibleProviders.Items[0]).CreateIAccessible(ATree);
+        Exit;
       end;
     end;
     if ATree.AccessibleItem = nil then
@@ -97,19 +87,18 @@ begin
           TmpIAccessible := IVTAccessibleProvider(FAccessibleProviders.Items[I]).CreateIAccessible(ATree);
           if TmpIAccessible <> nil then
           begin
-            result := TmpIAccessible;
-            break;
+            Result := TmpIAccessible;
+            Break;
           end;
         end;
         if TmpIAccessible = nil then
         begin
-          result := IVTAccessibleProvider(FAccessibleProviders.Items[0]).CreateIAccessible(ATree);
+          Result := IVTAccessibleProvider(FAccessibleProviders.Items[0]).CreateIAccessible(ATree);
         end;
       end;
     end
-    else begin
+    else
       Result := ATree.AccessibleItem;
-    end;
   end;
 end;
 
@@ -117,10 +106,7 @@ destructor TVTAccessibilityFactory.Destroy;
 begin
   FAccessibleProviders.Free;
   FAccessibleProviders := nil;
-  {$ifndef COMPILER_10_UP}
-    FreeAccLibrary;
-  {$endif COMPILER_10_UP}
-  inherited;
+  inherited Destroy;
 end;
 
 procedure TVTAccessibilityFactory.RegisterAccessibleProvider(
@@ -147,25 +133,21 @@ function GetAccessibilityFactory: TVTAccessibilityFactory;
 begin
   // first, check if we've loaded the library already
   if not AccessibilityAvailable then
-    {$ifndef COMPILER_10_UP}
-      AccessibilityAvailable := InitAccLibrary;
-    {$else}
-      AccessibilityAvailable := True;
-    {$endif COMPILER_10_UP}
+    AccessibilityAvailable := True;
   if AccessibilityAvailable then
   begin
     // Check to see if the class has already been created.
     if VTAccessibleFactory = nil then
       VTAccessibleFactory := TVTAccessibilityFactory.Create;
-    result := VTAccessibleFactory;
+    Result := VTAccessibleFactory;
   end
   else
-    result := nil;
+    Result := nil;
 end;
-
 
 initialization
 
 finalization
-  VTAccessibleFactory.free;
+  VTAccessibleFactory.Free;
+
 end.
