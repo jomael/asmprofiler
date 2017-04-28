@@ -3,7 +3,7 @@ unit _uProfilerManager;
 interface
 
 uses
-  Classes, Windows, SysUtils, Forms,
+  Classes, Windows, System.Types, SysUtils, Forms,
   Dialogs, Controls,
   Inifiles, Contnrs,
   GpSync,
@@ -48,6 +48,8 @@ type
     FFileVersion: Single;
     FLoadedDllsInfoFile: string;
     FLoadedDllsDbgFile: string;
+    FModulesInfoFile: string;
+    FModulesDbgFile: string;
     procedure SetMapFilename(const Value: string);
     procedure SetCustomDebugInfoFile(const Value: string);
     procedure SetInternalDebugInfoFile(const Value: string);
@@ -100,7 +102,10 @@ type
 
     property LoadedDllsInfoFile: string read FLoadedDllsInfoFile write FLoadedDllsInfoFile;
     property LoadedDllsDbgFile: string read FLoadedDllsDbgFile write FLoadedDllsDbgFile;
-  public
+
+    property ModulesInfoFile: string read FModulesInfoFile write FModulesInfoFile;
+    property ModulesDbgFile: string read FModulesDbgFile write FModulesDbgFile;
+   public
     property ThreadNames: TThreadNameArray read FThreadNames write FThreadNames;
     property ProfileTimes: TProfileThreadSlotArray read FProfileTimes write FProfileTimes;
   end;
@@ -110,6 +115,7 @@ type
     FCustomDebugInfo: TDebugInfoStorage;
     FInternalDebugInfo: TInternalItemsStorage;
     FMainMapFile: TMapFileLoader;
+    FModulesDebugInfo: TProgramModulesStorage;
     //FCustomSelectedItemsCount: Integer;
     FIniFile: TMemInifile;
     //FInternalSelectedItemsCount: Integer;
@@ -124,6 +130,7 @@ type
     FStarted: boolean;
 //    FProfileOverhead: integer;
     FLoadedDllsInfo: TProgramLoadedDllsStorage;
+
     function GetStarted: boolean;
     function GetStartTime: TDatetime;
     //procedure SetProfileOverhead(const Value: integer);
@@ -145,8 +152,12 @@ type
 
     procedure SetDirectory;
 
-    procedure CreateProfileIntercepts(const aArray:PSelectedUnitArray; const aOffSet:Cardinal);
-    procedure RemoveProfileIntercepts(var aArray:TSelectedUnitArray; const aOffSet:Cardinal);
+    procedure CreateProfileIntercepts(const aArray:PSelectedUnitArray; const aOffSet:Cardinal);  overload;
+    procedure RemoveProfileIntercepts(var aArray:TSelectedUnitArray; const aOffSet:Cardinal);    overload;
+
+    procedure CreateProfileIntercepts(const modulesInfo: TProgramModulesStorage); overload;
+    procedure RemoveProfileIntercepts(const modulesInfo: TProgramModulesStorage); overload;
+
   public
     constructor Create;virtual;
     destructor Destroy;override;
@@ -172,6 +183,7 @@ type
     property InternalDebugInfo: TInternalItemsStorage read FInternalDebugInfo;
     property LoadedDllsInfo: TProgramLoadedDllsStorage read FLoadedDllsInfo;
     property MainMapFile: TMapFileLoader read FMainMapFile;
+    property ModulesInfo: TProgramModulesStorage read FModulesDebugInfo;
   end;
 
 var
@@ -240,6 +252,7 @@ constructor TProfilerManager.Create;
 var
   sMap, sDll: string;
   iMappedAddress, iLength: Cardinal;
+  otherHInstance : HINST;
 begin
   sMap   := ChangeFileExt(Application.ExeName,'.map');
   sDll   := '';
@@ -310,6 +323,10 @@ begin
   FLoadedDllsInfo.HasRelativeAddresses := False;
   FLoadedDllsInfo.Offset               := 0;
 
+  FModulesDebugInfo := TProgramModulesStorage.Create;
+  FModulesDebugInfo.HasRelativeAddresses := False;
+  FModulesDebugInfo.Offset               := 0;
+
   FIgnoredProcedures     := TStringList.Create;
   FInterceptedProcedures := TStringList.Create;
 
@@ -326,6 +343,43 @@ begin
   if frmProfileMain = nil then
     frmProfileMain := TfrmProfileMain.Create(Application);
   {$endif}
+end;
+
+procedure TProfilerManager.CreateProfileIntercepts(
+  const modulesInfo: TProgramModulesStorage);
+var
+  selectedUnit          : TSelectedUnit;
+  selectedUnitProcedure : TSelectedProc;
+
+  unitName, moduleName  : string;
+
+  moduleInfo            : TMapFileLoader;
+  theArray              : TSelectedUnitArray;
+
+  procedure _ExtractModuleInfo(const selUnit : TSelectedUnit; out moduleName, unitName : string);
+  var
+    seperatorPos : Integer;
+  begin
+    seperatorPos := Pos('?', selUnit.UnitName);
+
+    moduleName := Copy(selectedUnit.UnitName, 0, seperatorPos-1);
+    unitName   := Copy(selectedUnit.UnitName, seperatorPos+1, Length(selectedUnit.UnitName)-seperatorPos);
+  end;
+
+
+begin
+
+  SetLength(theArray, 1);
+
+  for selectedUnit in modulesInfo.SelectedUnitProcedures^ do begin
+
+    _ExtractModuleInfo(selectedUnit, moduleName, unitName);
+    moduleInfo := modulesInfo.MapFileForModuleName(moduleName);
+
+    theArray[0] := selectedUnit;
+
+    CreateProfileIntercepts(@theArray, moduleInfo.Offset);
+  end;
 end;
 
 procedure TProfilerManager.CreateProfileIntercepts(
@@ -417,6 +471,7 @@ begin
   FInternalDebugInfo.Free;
   FCustomDebugInfo.Free;
   FLoadedDllsInfo.Free;
+  FModulesDebugInfo.Free;
 
   FIniFile.Free;
   FCurrentRun.Free;
@@ -494,7 +549,6 @@ begin
     strm.CopyFrom(fs, fs.Size);
     strm.Position := 0;
     fs.Free;
-  
     //nr
     strm.Read(iNr, Sizeof(iNr) );
     //save time
@@ -543,6 +597,8 @@ begin
   FCustomDebugInfo.LoadSelectionFromFile(sFile);
   sFile := FBaseDirectory + 'LoadedDllsSelectedProcs.ini';
   FLoadedDllsInfo.LoadSelectionFromFile(sFile);
+  sFile := FBaseDirectory + 'ModulesSelectedProcs.ini';
+  FModulesDebugInfo.LoadSelectionFromFile(sFile);
 
   //FSelectedItemsCount          := FMainMapFile.SelectedUnitProceduresCount;
   //FInternalSelectedItemsCount  := FInternalDebugInfo.SelectedUnitProceduresCount;
@@ -565,6 +621,7 @@ begin
     frmSelectItems.InternalDebugInfo  := Self.FInternalDebugInfo;
     frmSelectItems.CustomDebugInfo    := Self.CustomDebugInfo;
     frmSelectItems.LoadedDllsInfo     := Self.LoadedDllsInfo;
+    frmSelectItems.ModulesInfo        := Self.ModulesInfo;
 
     frmSelectItems.SaveSelectedItemLists;
     FSelectItemsChanged := True;
@@ -581,6 +638,12 @@ begin
   end;
 
   FSelectItemsRefreshed := True;
+end;
+
+procedure TProfilerManager.RemoveProfileIntercepts(
+  const modulesInfo: TProgramModulesStorage);
+begin
+// TODO
 end;
 
 procedure TProfilerManager.RemoveProfileIntercepts(
@@ -688,6 +751,12 @@ begin
   sFile := FCustomDebugInfo.ExportSelectionToDir(sDir);
   CurrentRun.CustomDebugInfoFile   := ExtractFileName(sFile);
 
+  sFile := FModulesDebugInfo.ExportSelectionToDir(sDir);
+  CurrentRun.ModulesInfoFile := ExtractFileName(sFile);
+  sFile := ChangeFileExt(sFile,'.pdbg');
+  FModulesDebugInfo.SaveToFile_Pdbg(sFile);
+  CurrentRun.LoadedDllsDbgFile := sFile;
+
   CurrentRun.SaveProfileTimesToDir( sDir );
   CurrentRun.SaveToFile( sDir );
   //CurrentRun.LoadProfileTimesFromDir( sDir );
@@ -794,14 +863,17 @@ begin
   FCustomDebugInfo.SaveSelectionToFile(sFile);
   sFile := FBaseDirectory + 'LoadedDllsSelectedProcs.ini';
   FLoadedDllsInfo.SaveSelectionToFile(sFile);
+  sFile := FBaseDirectory + 'ModulesSelectedProcs.ini';
+  FModulesDebugInfo.SaveSelectionToFile(sFile);
 end;
 
 function TProfilerManager.SelectedItemsCount: integer;
 begin
-  Result := (FMainMapFile.SelectedUnitProceduresCount) +
-            (FInternalDebugInfo.SelectedUnitProceduresCount) +
-            (FLoadedDllsInfo.SelectedUnitProceduresCount) +
-            (FCustomDebugInfo.SelectedUnitProceduresCount);
+  Result := (FMainMapFile.SelectedUnitProceduresCount)
+            + (FInternalDebugInfo.SelectedUnitProceduresCount)
+            + (FLoadedDllsInfo.SelectedUnitProceduresCount)
+            + (FCustomDebugInfo.SelectedUnitProceduresCount)
+            + (FModulesDebugInfo.SelectedUnitProceduresCount);
 end;
 
 procedure TProfilerManager.SetDirectory;
@@ -911,6 +983,7 @@ begin
     frmSelectItems.InternalDebugInfo  := Self.FInternalDebugInfo;
     frmSelectItems.CustomDebugInfo    := Self.CustomDebugInfo;
     frmSelectItems.LoadedDllsInfo     := Self.LoadedDllsInfo;
+    frmSelectItems.ModulesInfo        := Self.ModulesInfo;
 
     if frmSelectItems.ShowModal = mrOk then
     begin
@@ -972,10 +1045,12 @@ begin
     FInterceptedProcedures.Capacity := 1024;
 
     try
-      CreateProfileIntercepts(FMainMapFile.SelectedUnitProcedures, FMainMapFile.Offset);
+      CreateProfileIntercepts(FMainMapFile.SelectedUnitProcedures,       FMainMapFile.Offset);
       CreateProfileIntercepts(FInternalDebugInfo.SelectedUnitProcedures, FInternalDebugInfo.Offset);
-      CreateProfileIntercepts(FCustomDebugInfo.SelectedUnitProcedures, FCustomDebugInfo.Offset);
-      CreateProfileIntercepts(FLoadedDllsInfo.SelectedUnitProcedures, FLoadedDllsInfo.Offset);
+      CreateProfileIntercepts(FCustomDebugInfo.SelectedUnitProcedures,   FCustomDebugInfo.Offset);
+      CreateProfileIntercepts(FLoadedDllsInfo.SelectedUnitProcedures,    FLoadedDllsInfo.Offset);
+
+      CreateProfileIntercepts(FModulesDebugInfo);
       FSelectItemsChanged := False;
     except
       on e:exception do

@@ -23,9 +23,8 @@ object frmSelectItems: TfrmSelectItems
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
-    DoubleBuffered = True
     Kind = bkCancel
-    ParentDoubleBuffered = False
+    NumGlyphs = 2
     TabOrder = 0
   end
   object btnOK: TBitBtn
@@ -36,7 +35,6 @@ object frmSelectItems: TfrmSelectItems
     Anchors = [akRight, akBottom]
     Caption = 'OK'
     Default = True
-    DoubleBuffered = True
     Glyph.Data = {
       DE010000424DDE01000000000000760000002800000024000000120000000100
       0400000000006801000000000000000000001000000000000000000000000000
@@ -56,7 +54,6 @@ object frmSelectItems: TfrmSelectItems
       0000}
     ModalResult = 1
     NumGlyphs = 2
-    ParentDoubleBuffered = False
     TabOrder = 1
     OnClick = btnOKClick
   end
@@ -65,7 +62,7 @@ object frmSelectItems: TfrmSelectItems
     Top = 0
     Width = 691
     Height = 577
-    ActivePage = tsMapFile
+    ActivePage = tsModules
     Align = alTop
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 2
@@ -78,17 +75,22 @@ object frmSelectItems: TfrmSelectItems
         Height = 549
         Align = alClient
         TabOrder = 0
+        ExplicitHeight = 549
         inherited vtreeItems: TVirtualStringTree
           Height = 518
           TreeOptions.SelectionOptions = [toFullRowSelect, toMultiSelect, toSimpleDrawSelection]
+          ExplicitHeight = 518
         end
         inherited Panel1: TPanel
           Top = 518
+          ExplicitTop = 518
           inherited Label2: TLabel
             Width = 93
+            ExplicitWidth = 93
           end
           inherited lblIncrSearch: TLabel
             Width = 6
+            ExplicitWidth = 6
           end
         end
       end
@@ -103,17 +105,22 @@ object frmSelectItems: TfrmSelectItems
         Height = 549
         Align = alClient
         TabOrder = 0
+        ExplicitHeight = 549
         inherited vtreeItems: TVirtualStringTree
           Height = 518
           TreeOptions.SelectionOptions = [toMultiSelect, toSimpleDrawSelection]
+          ExplicitHeight = 518
         end
         inherited Panel1: TPanel
           Top = 518
+          ExplicitTop = 518
           inherited Label2: TLabel
             Width = 93
+            ExplicitWidth = 93
           end
           inherited lblIncrSearch: TLabel
             Width = 6
+            ExplicitWidth = 6
           end
         end
       end
@@ -128,17 +135,22 @@ object frmSelectItems: TfrmSelectItems
         Height = 549
         Align = alClient
         TabOrder = 0
+        ExplicitHeight = 549
         inherited vtreeItems: TVirtualStringTree
           Height = 518
           TreeOptions.SelectionOptions = [toMultiSelect, toSimpleDrawSelection]
+          ExplicitHeight = 518
         end
         inherited Panel1: TPanel
           Top = 518
+          ExplicitTop = 518
           inherited Label2: TLabel
             Width = 93
+            ExplicitWidth = 93
           end
           inherited lblIncrSearch: TLabel
             Width = 6
+            ExplicitWidth = 6
           end
         end
       end
@@ -186,17 +198,22 @@ object frmSelectItems: TfrmSelectItems
         Height = 549
         Align = alClient
         TabOrder = 0
+        ExplicitHeight = 549
         inherited vtreeItems: TVirtualStringTree
           Height = 518
           TreeOptions.SelectionOptions = [toMultiSelect, toSimpleDrawSelection]
+          ExplicitHeight = 518
         end
         inherited Panel1: TPanel
           Top = 518
+          ExplicitTop = 518
           inherited Label2: TLabel
             Width = 93
+            ExplicitWidth = 93
           end
           inherited lblIncrSearch: TLabel
             Width = 6
+            ExplicitWidth = 6
           end
         end
       end
@@ -245,6 +262,36 @@ object frmSelectItems: TfrmSelectItems
         ItemHeight = 13
         TabOrder = 2
         OnClick = lbModulesClick
+      end
+    end
+    object tsModules: TTabSheet
+      Caption = 'tsModules'
+      ImageIndex = 7
+      inline framModules: TframUnitTreeview
+        Left = 0
+        Top = 0
+        Width = 683
+        Height = 549
+        Align = alClient
+        TabOrder = 0
+        ExplicitHeight = 549
+        inherited vtreeItems: TVirtualStringTree
+          Height = 518
+          TreeOptions.SelectionOptions = [toFullRowSelect, toMultiSelect, toSimpleDrawSelection]
+          ExplicitHeight = 518
+        end
+        inherited Panel1: TPanel
+          Top = 518
+          ExplicitTop = 518
+          inherited Label2: TLabel
+            Width = 93
+            ExplicitWidth = 93
+          end
+          inherited lblIncrSearch: TLabel
+            Width = 6
+            ExplicitWidth = 6
+          end
+        end
       end
     end
   end

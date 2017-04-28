@@ -37,6 +37,8 @@ type
     lbModules: TListBox;
     tsLoadedDlls: TTabSheet;
     framLoadedDlls: TframUnitTreeview;
+    tsModules: TTabSheet;
+    framModules: TframUnitTreeview;
     procedure FormCreate(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
     procedure btnLoadProgramImportExportClick(Sender: TObject);
@@ -49,10 +51,12 @@ type
     FInternalDebugInfo: TDebugInfoStorage;
     FCustomDebugInfo: TDebugInfoStorage;
     FLoadedDllsInfo: TProgramLoadedDllsStorage;
+    FModulesInfo: TProgramModulesStorage;
     procedure SetMapFileLoader(const Value: TMapFileLoader);
     procedure SetCustomDebugInfo(const Value: TDebugInfoStorage);
     procedure SetInternalDebugInfo(const Value: TDebugInfoStorage);
     procedure SetLoadedDllsInfo(const Value: TProgramLoadedDllsStorage);
+    procedure SetModulesInfo(const Value: TProgramModulesStorage);
     { Private declarations }
   protected
   public
@@ -63,6 +67,7 @@ type
     property InternalDebugInfo: TDebugInfoStorage read FInternalDebugInfo write SetInternalDebugInfo;
     property CustomDebugInfo: TDebugInfoStorage read FCustomDebugInfo write SetCustomDebugInfo;
     property LoadedDllsInfo: TProgramLoadedDllsStorage read FLoadedDllsInfo write SetLoadedDllsInfo;
+    property ModulesInfo: TProgramModulesStorage read FModulesInfo write SetModulesInfo;
   end;
 
 var
@@ -79,6 +84,12 @@ procedure TfrmSelectItems.SetMapFileLoader(const Value: TMapFileLoader);
 begin
   FMapFileLoader := Value;
   framMapfile.DebugInfoStorage := Value;
+end;
+
+procedure TfrmSelectItems.SetModulesInfo(const Value: TProgramModulesStorage);
+begin
+  FModulesInfo := Value;
+  framModules.DebugInfoStorage := Value;
 end;
 
 procedure TfrmSelectItems.FormCreate(Sender: TObject);
@@ -177,6 +188,7 @@ begin
   framInternalItems.SaveSelectedItemsList;
   framCustomItems.SaveSelectedItemsList;
   framLoadedDlls.SaveSelectedItemsList;
+  framModules.SaveSelectedItemsList;
 end;
 
 end.

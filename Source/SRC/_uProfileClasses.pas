@@ -4,6 +4,7 @@ interface
 
 uses
   Classes, SysUtils, Windows, Forms,
+  System.Generics.Collections,
   JclDebug, JclBase,
   _uProfileTypes, jclSysInfo, JclPeImage;
 
@@ -120,6 +121,7 @@ type
     property Directory: string read FDirectory;
     property MapFilename: string read FMapFilename;
     property DbgFilename: string read FDbgFilename;
+    property TopValidAddr: Integer read FTopValidAddr;
   end;
 
   TProgramImportsExportsStorage = class (TDebugInfoStorage)
@@ -136,6 +138,23 @@ type
     destructor Destroy; override;
 
     procedure LoadProgramLoadedDlls;
+  end;
+
+
+  TProgramModulesStorage = class (TDebugInfoStorage)
+  private
+    FModuleMapFiles : TDictionary<string,TMapFileLoader>;
+
+    function GetValues() : TDictionary<string,TMapFileLoader>.TValueCollection;
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+
+    procedure LoadProgramModules;
+
+    function MapFileForModuleName(const moduleName: string): TMapFileLoader;
+
+    property Values : TDictionary<string,TMapFileLoader>.TValueCollection read GetValues;
   end;
 
   ISerializableObject = interface(IInterface)
@@ -1657,6 +1676,115 @@ begin
   end;
 
   UpdateInternalSelection;
+end;
+
+{ TProgramModulesStorage }
+
+constructor TProgramModulesStorage.Create;
+begin
+  inherited;
+
+  FModuleMapFiles := TDictionary<string, TMapFileLoader>.Create();
+
+  LoadProgramModules();
+end;
+
+destructor TProgramModulesStorage.Destroy;
+var
+  mapfile : TMapFileLoader;
+begin
+  for mapfile in FModuleMapFiles.Values do
+    mapfile.Free();
+
+  FModuleMapFiles.Free();
+
+  inherited;
+end;
+
+function TProgramModulesStorage.GetValues: TDictionary<string, TMapFileLoader>.TValueCollection;
+begin
+  Result := FModuleMapFiles.Values;
+end;
+
+procedure TProgramModulesStorage.LoadProgramModules;
+var
+  i             : Integer;
+  loadedModules : TStrings;
+  hModule       : THandle;
+  sModule       : string;
+  mapFilename   : string;
+  mapFile       : TMapFileLoader;
+  iUnit         : Integer;
+
+  procedure _AppendSegments(const segments : TJclMapSegmentExtArray);
+  var
+    loop    : Integer;
+    offset  : Integer;
+    segment : TJclMapSegmentExt;
+  begin
+
+    offset := Length(FSegments);
+    SetLength(FSegments, Length(FSegments) + Length(segments));
+
+    for loop := Low(segments) to High(segments) do begin
+      segment := segments[loop];
+
+      segment.UnitName := sModule + '?' + segment.UnitName;
+      FSegments[offset + loop] := segment;
+    end;
+  end;
+
+  procedure _AppendProcNames(const procNames : TJclMapProcNameExtArray);
+  var
+    loop     : Integer;
+    offset   : Integer;
+  begin
+
+    offset := Length(FProcNames);
+    SetLength(FProcNames, Length(FProcNames) + Length(procNames));
+
+    for loop := Low(procNames) to High(procNames) do begin
+      FProcNames[offset + loop] := procNames[loop];
+    end;
+  end;
+
+begin
+  loadedModules := TStringList.Create();
+
+  try
+    jclSysInfo.LoadedModulesList(loadedModules, GetCurrentProcessId, False);
+
+    for i := 0 to loadedModules.Count - 1 do
+    begin
+      hModule := THandle(loadedModules.Objects[i]);
+      sModule :=         loadedModules.Strings[i];
+
+      // filter out AsmProfiler and system dlls
+      if (SameText(sModule, Application.ExeName)
+         or SameText(ExtractFileName(sModule), 'AsmProfiler.dll')
+         or sModule.StartsWith('C:\Windows', true))
+      then continue;
+
+      mapFilename := ChangeFileExt(sModule,'.map');
+      if FileExists(mapFilename) then begin
+        mapFile := TMapFileLoader.Create(mapFilename);
+        mapFile.Offset := hModule + $1000;  // Module loaded base address + code segment offset
+
+        FModuleMapFiles.Add(sModule, mapFile);
+        _AppendSegments (mapFile.FSegments);
+        _AppendProcNames(mapFile.FProcNames);
+
+      end;
+    end;
+  finally
+    FreeAndNil(loadedModules);
+  end;
+end;
+
+function TProgramModulesStorage.MapFileForModuleName(
+  const moduleName: string): TMapFileLoader;
+begin
+  Result := FModuleMapFiles[moduleName];
 end;
 
 end.

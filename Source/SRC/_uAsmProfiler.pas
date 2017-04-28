@@ -182,8 +182,9 @@ begin
 //      DebugBreak;
 
 //  tr := GThreadRecord;
-  tr := _GetOwnTls;
-//  tr := TlsGetValue(GOwnTlsIndex);
+//  tr := _GetOwnTls;
+  tr := TlsGetValue(GOwnTlsIndex);
+
   if tr = nil then
   begin
     tr := TThreadRecord.GetRecord;
@@ -234,7 +235,9 @@ begin
 //    if MainThreadID = GetCurrentThreadId then
 //      DebugBreak;
 
-  tr     := _GetOwnTls;
+//  tr     := _GetOwnTls;
+  tr     := TlsGetValue(GOwnTLSIndex);
+
   if tr = nil then
   begin
     tr := TThreadRecord.GetRecord;
