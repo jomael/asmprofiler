@@ -31,7 +31,7 @@ const
 { TRemoteControlThread }
 
 procedure TRemoteControlThread.Execute;
-var sMsg: string;
+var sMsg: AnsiString;
 begin
 //  MainThreadID := 123;
 
