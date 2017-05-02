@@ -277,6 +277,10 @@ procedure ProfileStart;
 //var
 //DO NOT USE LOCAL VARIABLES! BECAUSE THEY WILL USE THE STACK!
 //We cannot use the stack, it will corrupt the stack for the original/profiled function!
+{$IFDEF NO_PROFILE_CODE}
+begin
+end;
+{$ELSE}
 asm
     //if not GProfileStarted^ then exit;
 //    mov  eax, GProfileStartedMarker          //pointer of GProfileStarted^, will be overwritten with real memory pointer at runtime
@@ -327,8 +331,13 @@ asm
     jmp dword ptr GDummyProfileMarker
     //jmp  GTrampoline_ProfileTest;
 end;
+{$ENDIF}
 
 procedure ProfileEnd;
+{$IFDEF NO_PROFILE_CODE}
+begin
+end;
+{$ELSE}
 asm
     {save the registers again, can be used from return values of functions}
     pushad;
@@ -361,6 +370,7 @@ asm
 //    {return, goes to original call}
 //    ret;
 end;
+{$ENDIF}
 
 function DummyProfileMarker: int64;
 begin
@@ -822,7 +832,7 @@ begin
   begin
     Time        := ClockTicks;
     ProfileType := ptEnter;
-    Address     := Pointer(aCallee);
+    Address     := aCallee;
   end;
 
   inc(CurrentProfileTimeCount);
@@ -855,7 +865,7 @@ begin
     begin
       ProfileType := ptLeave;
       {stored callee}
-      Address     := SecondStackPos.Callee;
+      Address     := Cardinal(SecondStackPos.Callee);
       Time        := ClockTicks;
     end;
 
@@ -932,6 +942,7 @@ procedure InitializeProfiling;
 var
   i:integer;
 begin
+{$IFNDEF NO_PROFILE_CODE}
   //AddTerminateProc(TerminateProc);
   //if forms.Application = nil then sleep(0);
 
@@ -1013,10 +1024,12 @@ begin
   {$ENDIF}
 
   GProfileOverhead := CalcProfileOverhead;
+{$ENDIF}
 end;
 
 procedure FinalizeProfiling;
 begin
+{$IFNDEF NO_PROFILE_CODE}
   //stop profiling
   GProfileStarted^ := False;
 
@@ -1024,6 +1037,7 @@ begin
   DeleteCriticalSection(GCriticalSection);
 
   ProfilerManager.Free;
+{$ENDIF}
 end;
 
 initialization

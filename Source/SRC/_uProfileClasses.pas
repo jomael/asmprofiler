@@ -631,6 +631,27 @@ var
   sString: ansistring;
   i, j: Integer;
   iStringLength, iTotalProcCount, iProcCount, iProcs, iUnitCount: Integer;
+
+  procedure _ReadMapSegment(out segment : TJclMapSegmentExt);
+  var
+    dummy : Integer;
+  begin
+    strm.Read(segment.StartAddr, sizeof(DWORD));
+    strm.Read(segment.EndAddr,   sizeof(DWORD));
+
+    strm.Read(dummy, sizeof(Integer)); // Unitname ptr
+    strm.Read(dummy, sizeof(Integer)); // Unitfile ptr
+    strm.Read(dummy, sizeof(Integer)); // unit procs ptr
+  end;
+
+  procedure _ReadMapProcname(out procName : TJclMapProcNameExt);
+  var
+    dummy : Integer;
+  begin
+    strm.Read(procName.Addr, sizeof(DWORD));
+    strm.Read(dummy, sizeof(Integer)); // ProcName ptr
+  end;
+
 begin
   fs    := TFileStream.Create(aPdbgfile,fmOpenRead or fmShareDenyNone	);
   fs.Position   := 0;
@@ -646,7 +667,8 @@ begin
 
   for i := 0 to iUnitCount-1 do
   begin
-    strm.Read(FSegments[i], sizeof(TJclMapSegmentExt));
+//    strm.Read(FSegments[i], sizeof(TJclMapSegmentExt));
+    _ReadMapSegment(FSegments[i]);
 
     {
     TJclMapSegmentExt = record
@@ -680,7 +702,9 @@ begin
 
     for j := 0 to iProcCount-1 do
     begin
-      strm.Read(FSegments[i].Procs[j], sizeof(TJclMapProcNameExt));
+//      strm.Read(FSegments[i].Procs[j], sizeof(TJclMapProcNameExt));
+      _ReadMapProcname(FSegments[i].Procs[j]);
+
       {
       TJclMapProcNameExt = record
         Addr: DWORD;

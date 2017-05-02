@@ -149,10 +149,6 @@ object frmResults: TfrmResults
         object tsFunctionOverview: TTabSheet
           Caption = 'Function overview'
           ImageIndex = 1
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object vtreeItems: TVirtualStringTree
             Left = 0
             Top = 0
@@ -1293,7 +1289,7 @@ object frmResults: TfrmResults
     Left = 344
     Top = 216
     Bitmap = {
-      494C010103000500080010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010103000500100010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000B54D0800BD652100BD590800B5510800B5510800B55508000000

@@ -1294,7 +1294,7 @@ begin
     //find last real result
     with FProfileTimes[i] do
     for j := 0 to iProfileTimeCount - 1 do
-      if ProfileTime[j].Address = nil then
+      if ProfileTime[j].Address = 0 then
       begin
         iProfileTimeCount := j+1;
         Break;
@@ -1427,7 +1427,7 @@ begin
       //find last real result
       with FProfileTimes[i] do
       for j := 0 to iProfileTimeCount - 1 do
-        if ProfileTime[j].Address = nil then
+        if ProfileTime[j].Address = 0 then
         begin
           iProfileTimeCount := j+1;
           Break;

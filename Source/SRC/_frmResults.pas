@@ -372,7 +372,7 @@ var
     //iaUnit, iaProc: integer;
   begin
     Result := 0;
-    if (pta[j].Address <> nil) then
+    if (pta[j].Address <> 0) then
     begin
       iTotalTime := 0;
       if pta[j].ProfileType = ptEnter then
@@ -385,7 +385,7 @@ var
        // with FProfiledProcArray[iaProc]^ do
         mmoResults.Lines.Add( Format('%s-> %s - Adress: %p',
             //[sFill, FMainMapFile.GetProcByAddr(pta[j].Address), pta[j].Address]) );
-            [sFill, FMainMapFile.GetProcByAddr(pta[j].Address), pta[j].Address]) );
+            [sFill, FMainMapFile.GetProcByAddr(Pointer(pta[j].Address)), pta[j].Address]) );
 
         inc(j);
         if j >= high(pta) then exit;
@@ -399,7 +399,7 @@ var
 
         sFill := __FillString(aLevel*2);
         mmoResults.Lines.Add( Format('%s<- %s - Adress: %p - Diff: %s - Child: %s',
-            [sFill, FMainMapFile.GetProcByAddr(pta[j].Address), pta[j].Address, CalcTimeDiff(iTotalTime), CalcTimeDiff(iChildTime)]) );
+            [sFill, FMainMapFile.GetProcByAddr(Pointer(pta[j].Address)), pta[j].Address, CalcTimeDiff(iTotalTime), CalcTimeDiff(iChildTime)]) );
       end;
 
       Result := iTotalTime;
@@ -973,7 +973,7 @@ var
     Result := 0;
     bSkip  := True;
 
-    if (pta[iProfIndex].Address <> nil) then
+    if (pta[iProfIndex].Address <> 0) then
     begin
       iTotalTime := 0;
       if pta[iProfIndex].ProfileType = ptEnter then
@@ -1012,7 +1012,7 @@ var
         iChildCalls := 0;
         {if enter -> recursive process it}
         while (pta[iProfIndex].ProfileType = ptEnter) and
-              (pta[iProfIndex].Address <> nil) do
+              (pta[iProfIndex].Address <> 0) do
         begin
           {recursive process child calls}
           iResult    := __ProcessResult(aLevel+1, iaChildProc, iChildChildTime, iCallCount);
@@ -1110,7 +1110,7 @@ var
              or (pta[iProfIndex].Time = 0)  //end of profiling
            ) then
         begin
-          bSkip := (pta[iProfIndex].Address <> pointer(cAddress));
+          bSkip := (pta[iProfIndex].Address <> cAddress);
           with FProfiledProcArray[iaProc]^ do
           begin
             inc(CallCount);

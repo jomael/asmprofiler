@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Mask, VirtualTrees, Buttons, JvToolEdit;
+  Dialogs, StdCtrls, Mask, VirtualTrees, Buttons, JvToolEdit, JvExMask;
   //JvExMask;
 
 type
@@ -43,9 +43,9 @@ const
   {$IFDEF LINUX}
     PathSeparator    = '/';
   {$ENDIF LINUX}
-  {$IFDEF WIN32}
+  {$IFDEF MSWINDOWS}
     PathSeparator    = '\';
-  {$ENDIF WIN32}  
+  {$ENDIF MSWINDOWS}
 var
   srSearchRec: TSearchRec;
   iResult: Integer;

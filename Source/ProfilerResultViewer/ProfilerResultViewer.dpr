@@ -1,7 +1,6 @@
 program ProfilerResultViewer;
 
 uses
-  //FastMM4,
   Forms,
   _frmMain in '_frmMain.pas' {frmMain},
   _frmResults in '..\SRC\_frmResults.pas' {frmResults},

@@ -79,7 +79,7 @@ type
   TProfileTimeRecord = packed record
     ProfileType: TProfileType;
     //ThreadID: Cardinal;
-    Address: Pointer;
+    Address: Cardinal; // TODO: 64bit -> uInt64
     Time: Int64;
   end;
   PProfileTimeRecord = ^TProfileTimeRecord;
@@ -135,7 +135,6 @@ type
   TCardinalArray = array of cardinal;
 
   function CalcTimeText(const aTime: single): string;
-
 const
   msvcrt = 'msvcrt.dll';
 
@@ -314,7 +313,7 @@ var
   //rUnit: TSelectedUnit;
 //  rProc: TSelectedProc;
 
-  function __ReadString:ansistring;
+  function __ReadString : AnsiString;
   var iStringLength: integer;
   begin
     strm.Read(iStringLength,Sizeof(iStringLength));
@@ -323,6 +322,25 @@ var
       strm.Read(Result[1], iStringLength)
     else
       Result := '';
+  end;
+
+  procedure _ReadSelectedUnit(out selUnit : TSelectedUnit);
+  var
+    Dummy : Integer;
+  begin
+    strm.Read(Dummy, sizeof(Integer)); // UnitName str ptr
+    strm.Read(Dummy, sizeof(Integer)); // UnitSegmentRecord ptr PJclMapSegmentExt
+    strm.Read(selUnit.SelectedProcsCount, sizeof(Integer));
+    strm.Read(selUnit.TotalProcsCount, sizeof(Integer));
+    strm.Read(Dummy, sizeof(Integer)); // SelectedProcs array ptr
+  end;
+
+  procedure _ReadSelectedProc(out selProc : TSelectedProc);
+  var
+    Dummy : Integer;
+  begin
+    strm.Read(Dummy, sizeof(Integer)); // ProcName str ptr
+    strm.Read(Dummy, sizeof(Integer)); // ProcNameRecord  ptr PJclMapProcNameExt
   end;
 
 begin
@@ -343,7 +361,7 @@ begin
 
   for i := 0 to iUnitCount-1 do
   begin
-    strm.Read(Result[i], sizeof(TSelectedUnit));
+    _ReadSelectedUnit(Result[i]);
 
     {TSelectedUnit = record
     UnitName: string;
@@ -364,7 +382,7 @@ begin
 
     for j := 0 to iProcCount-1 do
     begin
-      strm.Read(Result[i].SelectedProcs[j], sizeof(TSelectedProc));
+      _ReadSelectedProc(Result[i].SelectedProcs[j]);
       {
       TSelectedProc = record
         ProcName: string;
@@ -400,7 +418,7 @@ begin
 
   for j := 0 to iTimes-1 do
   begin
-    if (j>0) and (pta[j].Address = nil) then
+    if (j>0) and (pta[j].Address = 0) then
     begin
       iPrevPos         := aStream.Position;
       aStream.Position := iSizePos;
@@ -414,7 +432,7 @@ begin
       Address: Pointer;
       Time: Int64;
     end;}
-    if (pta[j].Address <> nil) then
+    if (pta[j].Address <> 0) then
       inc(iResultCount);
 
     if aStream.Position + 1024 >= aStream.Size then
@@ -434,6 +452,13 @@ var
   //iTotalResultCount,
   iResultCount:integer;
   iTimes:integer;
+
+  procedure _ReadProfileTimeRecord(out timeRec : TProfileTimeRecord);
+  begin
+    aStream.Read(timeRec.ProfileType, sizeof(TProfileType));
+    aStream.Read(timeRec.Address, sizeof(Integer));
+    aStream.Read(timeRec.Time, sizeof(Int64));
+  end;
 begin
   //nr of results
   aStream.Read(iTimes, Sizeof(iTimes) );
@@ -449,9 +474,9 @@ begin
       Address: Pointer;
       Time: Int64;
     end;}
-    aStream.Read(aArray[j], Sizeof(aArray[j]) );
+    _ReadProfileTimeRecord(aArray[j]);
 
-    if (aArray[j].Address <> nil) then
+    if (aArray[j].Address <> 0) then
       inc(iResultCount);
   end;
 

@@ -1,9 +1,9 @@
 object frmMain: TfrmMain
   Left = 391
   Top = 330
-  Width = 680
-  Height = 427
   Caption = 'Profile Result Viewer'
+  ClientHeight = 388
+  ClientWidth = 664
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -14,8 +14,8 @@ object frmMain: TfrmMain
   Position = poScreenCenter
   OnCreate = FormCreate
   DesignSize = (
-    672
-    400)
+    664
+    388)
   PixelsPerInch = 96
   TextHeight = 13
   object Label1: TLabel
