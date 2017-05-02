@@ -143,6 +143,8 @@ type
 
   TProgramModulesStorage = class (TDebugInfoStorage)
   public
+    constructor Create; override;
+
     procedure LoadProgramModules;
   end;
 
@@ -1692,6 +1694,13 @@ begin
 end;
 
 { TProgramModulesStorage }
+
+constructor TProgramModulesStorage.Create;
+begin
+  inherited;
+
+  LoadProgramModules();
+end;
 
 procedure TProgramModulesStorage.LoadProgramModules;
 var
