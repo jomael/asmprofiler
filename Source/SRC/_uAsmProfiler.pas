@@ -2,6 +2,12 @@ unit _uAsmProfiler;
 
 interface
 
+
+// disable profiling code if running x64
+{$IFNDEF WIN32}
+{$DEFINE NO_PROFILE_CODE}
+{$ENDIF}
+
 {$OVERFLOWCHECKS OFF}
 
 uses
