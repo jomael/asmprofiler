@@ -148,13 +148,10 @@ type
     function _CreateProfiledUnitArrayOfProcArray(const aParentProcRecord: PProfiledProc; const aProcArray: TProfiledProcArray): TProfiledUnitArray;
     procedure _ClearProfiledUnitArrayOfProcArray(const aUnitArray: TProfiledUnitArray);
 
-    function _SearchAndAddCustomUnit(const aDebugInfo:TDebugInfoStorage; const aAddr: Cardinal; const offset: Cardinal): integer;
-    function _SearchAndAddCustomProc(const aDebugInfo:TDebugInfoStorage; const aUnitIndex: integer; const aAddr: Cardinal; const offset: Cardinal): integer;
+    function _SearchAndAddCustomUnit(const aDebugInfo:TDebugInfoStorage; const aAddr: Cardinal): integer;
+    function _SearchAndAddCustomProc(const aDebugInfo:TDebugInfoStorage; const aUnitIndex: integer; const aAddr: Cardinal): integer;
     function _SearchAndAddUnknownUnit(const aAddr: Cardinal): integer;
     function _SearchAndAddUnknownProc(const aUnitIndex: integer; const aAddr: Cardinal): integer;
-
-    function _SearchAndAddModuleUnit(const moduleInfos:TProgramModulesStorage; const aAddr: Cardinal): integer;
-    function _SearchAndAddModuleProc(const moduleInfos:TProgramModulesStorage; const aUnitIndex: integer; const aAddr: Cardinal): integer;
 
     procedure _SearchAndAddUnitProc(const aAddr: Cardinal; out aUnitIndex, aProcIndex: integer);
     procedure _FullSearchAndAddUnitProc(const aAddr: Cardinal; out aUnitIndex, aProcIndex: integer);
@@ -1755,8 +1752,7 @@ end;
 function TfrmResults._SearchAndAddCustomProc(
   const aDebugInfo:TDebugInfoStorage;
   const aUnitIndex: integer;
-  const aAddr: Cardinal;
-  const offset: Cardinal): integer;
+  const aAddr: Cardinal): integer;
 var
   iCustomUnitIndex,
   iCustomProcIndex,
@@ -1769,7 +1765,7 @@ begin
   iCustomProcIndex := -1;
   //iCustomUnitIndex := -1;
   if aUnitIndex < 0 then exit;
-  cAddr  := aAddr - offset;
+  cAddr  := aAddr - aDebugInfo.Offset;
   //cAddr  := aAddr;
   aUnits := aDebugInfo.SelectedUnitProcedures;
 
@@ -1853,8 +1849,7 @@ end;
 
 function TfrmResults._SearchAndAddCustomUnit(
   const aDebugInfo:TDebugInfoStorage;
-  const aAddr: Cardinal;
-  const offset: Cardinal): integer;
+  const aAddr: Cardinal): integer;
 var
   iCustomIndex,
   i:integer;
@@ -1862,7 +1857,7 @@ var
   aUnits: PSelectedUnitArray;
 begin
   Result := -1;
-  cAddr  := aAddr - offset;
+  cAddr  := aAddr - aDebugInfo.Offset;
   //cAddr  := aAddr;
   aUnits := aDebugInfo.SelectedUnitProcedures;
 
@@ -1899,41 +1894,6 @@ begin
       FProfiledUnitArray[Result].UnitName          := aUnits^[iCustomIndex].UnitName;
       FProfiledUnitArray[Result].UnitSegmentRecord := aUnits^[iCustomIndex].UnitSegmentRecord;
       FProfiledUnitArray[Result].TotalProfileTime  := 0;
-    end;
-  end;
-end;
-
-
-function TfrmResults._SearchAndAddModuleUnit(
-  const moduleInfos: TProgramModulesStorage; const aAddr: Cardinal): integer;
-var
-  moduleInfo : TMapFileLoader;
-begin
-  for moduleInfo in moduleInfos.Values do begin
-
-    if (aAddr > moduleInfo.Offset) and (aAddr < moduleInfo.Offset + moduleInfo.TopValidAddr) then begin
-      Result := _SearchAndAddCustomUnit(moduleInfos, aAddr, moduleInfo.Offset);
-
-      if Result >= 0
-      then Break;
-    end;
-  end;
-end;
-
-function TfrmResults._SearchAndAddModuleProc(
-  const moduleInfos: TProgramModulesStorage;
-  const aUnitIndex: integer;
-  const aAddr: Cardinal): integer;
-var
-  moduleInfo : TMapFileLoader;
-begin
-  for moduleInfo in moduleInfos.Values do begin
-
-    if (aAddr > moduleInfo.Offset) and (aAddr < moduleInfo.Offset + moduleInfo.TopValidAddr) then begin
-      Result := _SearchAndAddCustomProc(moduleInfos, aUnitIndex, aAddr, moduleInfo.Offset);
-
-      if Result >= 0
-      then Break;
     end;
   end;
 end;
@@ -2124,37 +2084,37 @@ begin
     exit;
   end;
 
-  aUnitIndex := _SearchAndAddCustomUnit( FMainMapFile, aAddr, FMainMapFile.Offset );
+  aUnitIndex := _SearchAndAddCustomUnit( FMainMapFile, aAddr );
   aProcIndex := -1;
   if aUnitIndex >= 0 then
-    aProcIndex := _SearchAndAddCustomProc( FMainMapFile, aUnitIndex, aAddr, FMainMapFile.Offset );
+    aProcIndex := _SearchAndAddCustomProc( FMainMapFile, aUnitIndex, aAddr );
 
   if (aUnitIndex < 0) or (aProcIndex < 0) then
   begin
-    aUnitIndex := _SearchAndAddCustomUnit( FInternalDebugInfo, aAddr, FInternalDebugInfo.Offset );
+    aUnitIndex := _SearchAndAddCustomUnit( FInternalDebugInfo, aAddr );
     if aUnitIndex >= 0 then
-      aProcIndex := _SearchAndAddCustomProc( FInternalDebugInfo, aUnitIndex, aAddr, FInternalDebugInfo.Offset )
+      aProcIndex := _SearchAndAddCustomProc( FInternalDebugInfo, aUnitIndex, aAddr )
   end;
 
   if (aUnitIndex < 0) or (aProcIndex < 0) then
   begin
-    aUnitIndex := _SearchAndAddCustomUnit( FCustomDebugInfo, aAddr, FCustomDebugInfo.Offset );
+    aUnitIndex := _SearchAndAddCustomUnit( FCustomDebugInfo, aAddr );
     if aUnitIndex >= 0 then
-      aProcIndex := _SearchAndAddCustomProc( FCustomDebugInfo, aUnitIndex, aAddr, FCustomDebugInfo.Offset )
+      aProcIndex := _SearchAndAddCustomProc( FCustomDebugInfo, aUnitIndex, aAddr )
   end;
 
   if (aUnitIndex < 0) or (aProcIndex < 0) then
   begin
-    aUnitIndex := _SearchAndAddCustomUnit( FLoadedDllsDebugInfo, aAddr, FLoadedDllsDebugInfo.Offset );
+    aUnitIndex := _SearchAndAddCustomUnit( FLoadedDllsDebugInfo, aAddr );
     if aUnitIndex >= 0 then
-      aProcIndex := _SearchAndAddCustomProc( FLoadedDllsDebugInfo, aUnitIndex, aAddr, FLoadedDllsDebugInfo.Offset )
+      aProcIndex := _SearchAndAddCustomProc( FLoadedDllsDebugInfo, aUnitIndex, aAddr )
   end;
 
   if (aUnitIndex < 0) or (aProcIndex < 0) then
   begin
-    aUnitIndex := _SearchAndAddModuleUnit( FModulesDebugInfo, aAddr );
+    aUnitIndex := _SearchAndAddCustomUnit( FModulesDebugInfo, aAddr );
     if aUnitIndex >= 0 then
-      aProcIndex := _SearchAndAddModuleProc( FModulesDebugInfo, aUnitIndex, aAddr )
+      aProcIndex := _SearchAndAddCustomProc( FModulesDebugInfo, aUnitIndex, aAddr )
   end;
 
   if (aUnitIndex < 0) or (aProcIndex < 0) then

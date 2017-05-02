@@ -152,11 +152,8 @@ type
 
     procedure SetDirectory;
 
-    procedure CreateProfileIntercepts(const aArray:PSelectedUnitArray; const aOffSet:Cardinal);  overload;
-    procedure RemoveProfileIntercepts(var aArray:TSelectedUnitArray; const aOffSet:Cardinal);    overload;
-
-    procedure CreateProfileIntercepts(const modulesInfo: TProgramModulesStorage); overload;
-    procedure RemoveProfileIntercepts(const modulesInfo: TProgramModulesStorage); overload;
+    procedure CreateProfileIntercepts(const aArray:PSelectedUnitArray; const aOffSet:Cardinal);
+    procedure RemoveProfileIntercepts(var aArray:TSelectedUnitArray; const aOffSet:Cardinal);
 
   public
     constructor Create;virtual;
@@ -343,43 +340,6 @@ begin
   if frmProfileMain = nil then
     frmProfileMain := TfrmProfileMain.Create(Application);
   {$endif}
-end;
-
-procedure TProfilerManager.CreateProfileIntercepts(
-  const modulesInfo: TProgramModulesStorage);
-var
-  selectedUnit          : TSelectedUnit;
-  selectedUnitProcedure : TSelectedProc;
-
-  unitName, moduleName  : string;
-
-  moduleInfo            : TMapFileLoader;
-  theArray              : TSelectedUnitArray;
-
-  procedure _ExtractModuleInfo(const selUnit : TSelectedUnit; out moduleName, unitName : string);
-  var
-    seperatorPos : Integer;
-  begin
-    seperatorPos := Pos('?', selUnit.UnitName);
-
-    moduleName := Copy(selectedUnit.UnitName, 0, seperatorPos-1);
-    unitName   := Copy(selectedUnit.UnitName, seperatorPos+1, Length(selectedUnit.UnitName)-seperatorPos);
-  end;
-
-
-begin
-
-  SetLength(theArray, 1);
-
-  for selectedUnit in modulesInfo.SelectedUnitProcedures^ do begin
-
-    _ExtractModuleInfo(selectedUnit, moduleName, unitName);
-    moduleInfo := modulesInfo.MapFileForModuleName(moduleName);
-
-    theArray[0] := selectedUnit;
-
-    CreateProfileIntercepts(@theArray, moduleInfo.Offset);
-  end;
 end;
 
 procedure TProfilerManager.CreateProfileIntercepts(
@@ -641,12 +601,6 @@ begin
 end;
 
 procedure TProfilerManager.RemoveProfileIntercepts(
-  const modulesInfo: TProgramModulesStorage);
-begin
-// TODO
-end;
-
-procedure TProfilerManager.RemoveProfileIntercepts(
   var aArray: TSelectedUnitArray; const aOffSet: Cardinal);
 var
   i, j: Integer;
@@ -755,7 +709,7 @@ begin
   CurrentRun.ModulesInfoFile := ExtractFileName(sFile);
   sFile := ChangeFileExt(sFile,'.pdbg');
   FModulesDebugInfo.SaveToFile_Pdbg(sFile);
-  CurrentRun.LoadedDllsDbgFile := sFile;
+  CurrentRun.ModulesDbgFile := sFile;
 
   CurrentRun.SaveProfileTimesToDir( sDir );
   CurrentRun.SaveToFile( sDir );
@@ -1049,8 +1003,8 @@ begin
       CreateProfileIntercepts(FInternalDebugInfo.SelectedUnitProcedures, FInternalDebugInfo.Offset);
       CreateProfileIntercepts(FCustomDebugInfo.SelectedUnitProcedures,   FCustomDebugInfo.Offset);
       CreateProfileIntercepts(FLoadedDllsInfo.SelectedUnitProcedures,    FLoadedDllsInfo.Offset);
+      CreateProfileIntercepts(FModulesDebugInfo.SelectedUnitProcedures,  FModulesDebugInfo.Offset);
 
-      CreateProfileIntercepts(FModulesDebugInfo);
       FSelectItemsChanged := False;
     except
       on e:exception do

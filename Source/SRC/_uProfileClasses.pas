@@ -142,19 +142,8 @@ type
 
 
   TProgramModulesStorage = class (TDebugInfoStorage)
-  private
-    FModuleMapFiles : TDictionary<string,TMapFileLoader>;
-
-    function GetValues() : TDictionary<string,TMapFileLoader>.TValueCollection;
   public
-    constructor Create; override;
-    destructor Destroy; override;
-
     procedure LoadProgramModules;
-
-    function MapFileForModuleName(const moduleName: string): TMapFileLoader;
-
-    property Values : TDictionary<string,TMapFileLoader>.TValueCollection read GetValues;
   end;
 
   ISerializableObject = interface(IInterface)
@@ -1680,71 +1669,59 @@ end;
 
 { TProgramModulesStorage }
 
-constructor TProgramModulesStorage.Create;
-begin
-  inherited;
-
-  FModuleMapFiles := TDictionary<string, TMapFileLoader>.Create();
-
-  LoadProgramModules();
-end;
-
-destructor TProgramModulesStorage.Destroy;
-var
-  mapfile : TMapFileLoader;
-begin
-  for mapfile in FModuleMapFiles.Values do
-    mapfile.Free();
-
-  FModuleMapFiles.Free();
-
-  inherited;
-end;
-
-function TProgramModulesStorage.GetValues: TDictionary<string, TMapFileLoader>.TValueCollection;
-begin
-  Result := FModuleMapFiles.Values;
-end;
-
 procedure TProgramModulesStorage.LoadProgramModules;
 var
-  i             : Integer;
-  loadedModules : TStrings;
-  hModule       : THandle;
-  sModule       : string;
-  mapFilename   : string;
-  mapFile       : TMapFileLoader;
-  iUnit         : Integer;
+  i              : Integer;
+  loadedModules  : TStrings;
+  hModule        : THandle;
+  sModule        : string;
+  mapFilename    : string;
+  mapFile        : TMapFileLoader;
+  iUnit          : Integer;
 
-  procedure _AppendSegments(const segments : TJclMapSegmentExtArray);
+  procedure _AppendSegments(const mapfile : TMapFileLoader);
   var
-    loop    : Integer;
+    loop, i : Integer;
     offset  : Integer;
     segment : TJclMapSegmentExt;
   begin
 
     offset := Length(FSegments);
-    SetLength(FSegments, Length(FSegments) + Length(segments));
+    SetLength(FSegments, Length(FSegments) + Length(mapfile.FSegments));
 
-    for loop := Low(segments) to High(segments) do begin
-      segment := segments[loop];
+    for loop := Low(mapfile.FSegments) to High(mapfile.FSegments) do begin
+      segment := mapfile.FSegments[loop];
 
-      segment.UnitName := sModule + '?' + segment.UnitName;
+      segment.UnitName  := sModule + '?' + segment.UnitName;
+      segment.StartAddr := segment.StartAddr + mapfile.Offset;
+      segment.EndAddr   := segment.EndAddr   + mapfile.Offset;
+
+      for i := Low(segment.Procs) to High(segment.Procs) do begin
+        segment.Procs[i].Addr := segment.Procs[i].Addr + mapfile.Offset;
+      end;
+
       FSegments[offset + loop] := segment;
     end;
   end;
 
-  procedure _AppendProcNames(const procNames : TJclMapProcNameExtArray);
+  procedure _AppendProcNames(const mapfile : TMapFileLoader);
   var
     loop     : Integer;
     offset   : Integer;
+    procname : TJclMapProcNameExt;
   begin
 
     offset := Length(FProcNames);
-    SetLength(FProcNames, Length(FProcNames) + Length(procNames));
 
-    for loop := Low(procNames) to High(procNames) do begin
-      FProcNames[offset + loop] := procNames[loop];
+    FProcNamesCnt := Length(FProcNames) + Length(mapfile.FProcNames);
+    SetLength(FProcNames, FProcNamesCnt);
+
+    for loop := Low(mapfile.FProcNames) to High(mapfile.FProcNames) do begin
+      procname := mapfile.FProcNames[loop];
+
+      procname.Addr := procname.Addr + mapfile.Offset;
+
+      FProcNames[offset + loop] := procname;
     end;
   end;
 
@@ -1770,21 +1747,14 @@ begin
         mapFile := TMapFileLoader.Create(mapFilename);
         mapFile.Offset := hModule + $1000;  // Module loaded base address + code segment offset
 
-        FModuleMapFiles.Add(sModule, mapFile);
-        _AppendSegments (mapFile.FSegments);
-        _AppendProcNames(mapFile.FProcNames);
+        _AppendSegments (mapFile);
+        _AppendProcNames(mapFile);
 
       end;
     end;
   finally
     FreeAndNil(loadedModules);
   end;
-end;
-
-function TProgramModulesStorage.MapFileForModuleName(
-  const moduleName: string): TMapFileLoader;
-begin
-  Result := FModuleMapFiles[moduleName];
 end;
 
 end.
