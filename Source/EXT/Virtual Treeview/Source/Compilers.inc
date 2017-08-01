@@ -127,10 +127,15 @@
 
 // Compiler defines not specific to a particlular platform.
 
+  {$ifdef VER310}
+    {$define COMPILER_13}
+  {$endif VER310}
+	
   //XE3
   {$ifdef VER240}
     {$define COMPILER_13}
   {$endif VER240}
+ {$define COMPILER_13}
   //XE2
   {$ifdef VER230}
     {$define COMPILER_13}
