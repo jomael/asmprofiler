@@ -3,7 +3,7 @@ unit _uProfileClasses;
 interface
 
 uses
-  Classes, SysUtils, Windows, Forms,
+  Classes, SysUtils, Windows, Forms, strutils,
   JclDebug, JclBase,
   _uProfileTypes, jclSysInfo, JclPeImage;
 
@@ -254,7 +254,7 @@ begin
   //FTopValidAddr := Max(FTopValidAddr, Address.Offset + Len);
 end;
 
-procedure TDebugInfoStorage.AddSelectedProcedure(const aUnitIndex, 
+procedure TDebugInfoStorage.AddSelectedProcedure(const aUnitIndex,
         aProcIndex:integer);
 var
   iSelUnit, iSelProc, i, j: Integer;
@@ -1608,6 +1608,33 @@ var
     end;
   end;
 
+  function __mapfileFunctions(const FileName:TFileName; const FunctionsList: TStrings): Boolean;
+  var
+    I,J: Integer;
+    mapfile:TMapFileLoader;
+  begin
+    mapfile:=TMapFileLoader.Create(FileName);
+    Result := pe.StatusOK;
+    if Result then
+    begin
+      FunctionsList.BeginUpdate;
+      try
+        for J := 0 to length( mapfile.FSegments) do
+        begin
+
+          with mapfile.FSegments[j] do
+            for I := 0 to length(Procs) - 1 do
+              with Procs[I] do
+
+                  FunctionsList.AddObject(ProcName,
+                      pointer(Addr ) );
+        end;
+      finally
+        FunctionsList.EndUpdate;
+      end;
+    end;
+  end;
+
 begin
   Self.Clear;
 
@@ -1640,6 +1667,9 @@ begin
       end;
       *)
 
+      if strutils.EndsText('.exe',LowerCase( sModule))  then
+      Continue;
+
       strE.Clear;
       __PeExportedFunctions(sModule, strE);
       for j := 0 to strE.Count - 1 do
@@ -1648,6 +1678,21 @@ begin
         hProc := THandle(strE.Objects[j]);
         AddProcedure(iUnit, sProc, hModule + hProc);
       end;
+
+      strE.Clear;
+      sModule:=LowerCase(sModule);
+      if not sModule.EndsWith('.dll') then Continue;
+
+      sModule:=ReplaceStr(sModule, '.dll','.map');
+      if not  FileExists(sModule) then  Continue;
+      __mapfileFunctions(sModule, strE);
+      for j := 0 to strE.Count - 1 do
+      begin
+        sProc := strE.Strings[j];
+        hProc := THandle(strE.Objects[j]);
+        AddProcedure(iUnit, sProc, hModule + hProc+$1000);
+      end;
+
     end;
 
   finally

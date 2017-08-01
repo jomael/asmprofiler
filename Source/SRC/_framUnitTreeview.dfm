@@ -10,7 +10,6 @@ object framUnitTreeview: TframUnitTreeview
     Width = 683
     Height = 407
     Align = alClient
-    CheckImageKind = ckDarkCheck
     DefaultNodeHeight = 14
     Header.AutoSizeIndex = 0
     Header.DefaultHeight = 17
@@ -19,6 +18,7 @@ object framUnitTreeview: TframUnitTreeview
     Header.Font.Height = -11
     Header.Font.Name = 'MS Sans Serif'
     Header.Font.Style = []
+    Header.Height = 17
     Header.Options = [hoColumnResize, hoDrag, hoVisible]
     IncrementalSearch = isAll
     IncrementalSearchTimeout = 2500
@@ -68,15 +68,15 @@ object framUnitTreeview: TframUnitTreeview
     object Label2: TLabel
       Left = 5
       Top = 8
-      Width = 96
-      Height = 13
+      Width = 115
+      Height = 16
       Caption = 'Incremental search:'
     end
     object lblIncrSearch: TLabel
       Left = 104
       Top = 8
-      Width = 8
-      Height = 13
+      Width = 10
+      Height = 16
       Caption = '()'
     end
   end

@@ -10,7 +10,6 @@ object framProfileResultTree: TframProfileResultTree
     Width = 921
     Height = 550
     Align = alClient
-    CheckImageKind = ckDarkCheck
     DefaultNodeHeight = 14
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -24,6 +23,7 @@ object framProfileResultTree: TframProfileResultTree
     Header.Font.Height = -11
     Header.Font.Name = 'MS Sans Serif'
     Header.Font.Style = []
+    Header.Height = 17
     Header.Options = [hoColumnResize, hoDrag, hoVisible]
     Header.SortDirection = sdDescending
     IncrementalSearch = isAll
