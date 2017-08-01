@@ -51,7 +51,7 @@ type
 
     function AddProcedure(const aUnitIndex:integer; const aProcName: string;
             const aProcAddr:cardinal): Integer;
-    function AddSegment(const aUnit:string): Integer;
+    function AddSegment(const aUnit:string;hasmap:Boolean): Integer;
     procedure AddSelectedProcedure(const aUnitIndex, aProcIndex:integer);
     //procedure ClearSelectedProcedures;
     function GetProcByFullAddress(const aProc:pointer): Integer;
@@ -80,7 +80,9 @@ type
             GetSelectedUnitProceduresText write SetSelectedUnitProceduresText;
     property UnitNames: TJclMapSegmentExtArray read FSegments;
 
+   
     property Filename: string read FFilename write SetFilename;
+
   end;
   
   TInternalItemsStorage = class(TDebugInfoStorage)
@@ -131,7 +133,11 @@ type
   end;
 
   TProgramLoadedDllsStorage = class (TDebugInfoStorage)
+  private
+    function IsSystemUnit(unitname:String):boolean;
   public
+    OnlyWithMap:Boolean;
+    NoSystemUnit:Boolean;
     constructor Create; override;
     destructor Destroy; override;
 
@@ -243,12 +249,13 @@ begin
   end;
 end;
 
-function TDebugInfoStorage.AddSegment(const aUnit:string): Integer;
+function TDebugInfoStorage.AddSegment(const aUnit:string;hasmap:Boolean): Integer;
 begin
   Result := Length(FSegments);
   SetLength(FSegments, Result + 1);
   FSegments[Result].UnitName  := Ansistring(aUnit);
   
+
   //FSegments[Result].StartAddr := Address.Offset;
   //FSegments[Result].EndAddr   := Address.Offset + Len;
   //FTopValidAddr := Max(FTopValidAddr, Address.Offset + Len);
@@ -586,6 +593,7 @@ begin
   end;
 end;
 
+
 procedure TDebugInfoStorage.UpdateInternalSelection;
 var
   i,j,k,l: integer;
@@ -728,7 +736,7 @@ begin
   strm := TMemoryStream.Create;
   strm.SetSize(1024 * 1024);      //default 1mb size
   try
-    iSegmentCount := high(FSegments);
+    iSegmentCount := length(FSegments);
     strm.Write(iSegmentCount, sizeof(iSegmentCount));
   
     for i := 0 to iSegmentCount-1 do
@@ -834,7 +842,7 @@ var
 
     iUnit  := GetSegmentByName(aUnitName);
     if iUnit < 0 then
-      iUnit := AddSegment(aUnitName);
+      iUnit := AddSegment(aUnitName,false);
 
     iproc := GetProcByName(aProcName,iUnit);
     if iproc < 0 then
@@ -1539,6 +1547,8 @@ constructor TProgramLoadedDllsStorage.Create;
 begin
   inherited;
   LoadProgramLoadedDlls;
+  OnlyWithMap:=True;
+  NoSystemUnit:=True;
 end;
 
 destructor TProgramLoadedDllsStorage.Destroy;
@@ -1547,15 +1557,39 @@ begin
   inherited;
 end;
 
+function TProgramLoadedDllsStorage.IsSystemUnit(unitname: String): boolean;
+const MyArray: array[1..35] of string =
+('system.', 'classes.', 'sysutils.', 'windows.', 'forms.', 'strutils.','sysinit.',
+'types.','activex.','varutils.','variants.','typInfo.','registry.','inifiles.',
+'graphics.','commctrl.','syncobjs.','dialogs.','stdactns.','menus.','controls.','imglist.',
+'actnlist.','stdctrls.','extctrls.','winsock2.','dateutils.','typinfo.','themes.',
+'contnrs.','multimon.','uxtheme.','helpintfs.','graphutil.','dwmapi.');
+var
+  I: Integer;
+begin
+    result:=False;
+    for I := 1 to length(MyArray) do
+    begin
+      if unitname.StartsWith(myarray[i]) then
+      begin
+        result:=True;
+        exit;
+      end;
+
+    end;
+
+end;
+
 procedure TProgramLoadedDllsStorage.LoadProgramLoadedDlls;
 var
   strM, strE:Tstrings;
   I: Integer;
   hModule, hProc: THandle;
-  sModule, sProc: string;
+  sModule, sProc,sMapfile: string;
   iUnit: Integer;
   pe: TJclPeImage;
   j: Integer;
+  hasmap:Boolean;
 
   function __PeImportedFunctions(const FileName: TFileName; const FunctionsList: TStrings;
     const LibraryName: string; IncludeLibNames: Boolean): Boolean;
@@ -1651,7 +1685,23 @@ begin
       sModule := strM.Strings[i];
       //iUnit  := GetSegmentByName(s);
       //if iUnit < 0 then
-      iUnit := AddSegment( ExtractFileName(sModule) );
+      sMapfile:=LowerCase(sModule);
+      if not sMapfile.EndsWith('.dll') then Continue;
+
+      sMapfile:=ReplaceStr(sMapfile, '.dll','.map');
+      if   FileExists(sMapfile) then
+      begin
+        hasmap:=true;
+      end
+      else
+      begin
+        hasmap:=False;
+      end;
+      if OnlyWithMap and  not hasmap then
+      Continue;
+
+
+      iUnit := AddSegment( ExtractFileName(sModule),hasmap );
 
       //load PE info of module
       pe.FileName := sModule;
@@ -1680,16 +1730,14 @@ begin
       end;
 
       strE.Clear;
-      sModule:=LowerCase(sModule);
-      if not sModule.EndsWith('.dll') then Continue;
 
-      sModule:=ReplaceStr(sModule, '.dll','.map');
-      if not  FileExists(sModule) then  Continue;
-      __mapfileFunctions(sModule, strE);
+      if not  hasmap then  Continue;
+      __mapfileFunctions(sMapfile, strE);
       for j := 0 to strE.Count - 1 do
       begin
         sProc := strE.Strings[j];
         hProc := THandle(strE.Objects[j]);
+        if not (NoSystemUnit and   IsSystemUnit( LowerCase(sProc))) then
         AddProcedure(iUnit, sProc, hModule + hProc+$1000);
       end;
 

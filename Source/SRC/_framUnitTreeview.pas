@@ -17,14 +17,13 @@ type
     SavetoHTML1: TMenuItem;
     SavetoRTF1: TMenuItem;
     SavetoText1: TMenuItem;
+    test1: TMenuItem;
     procedure vtreeItemsChecked(Sender: TBaseVirtualTree;
       Node: PVirtualNode);
     procedure vtreeItemsCompareNodes(Sender: TBaseVirtualTree; Node1,
       Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
     procedure vtreeItemsFreeNode(Sender: TBaseVirtualTree;
       Node: PVirtualNode);
-    procedure vtreeItemsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
-    TextType: TVSTTextType; var CellText: UnicodeString);
 //    procedure vtreeItemsIncrementalSearch(Sender: TBaseVirtualTree;
 //      Node: PVirtualNode; const SearchText: WideString;
 //      var Result: Integer);
@@ -39,6 +38,9 @@ type
       HitInfo: TVTHeaderHitInfo);
     procedure vtreeItemsIncrementalSearch(Sender: TBaseVirtualTree;
       Node: PVirtualNode; const SearchText: string; var Result: Integer);
+    procedure vtreeItemsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
+      Column: TColumnIndex; TextType: TVSTTextType; var CellText: string);
+    procedure test1Click(Sender: TObject);
   private
     FSelectedItemsCount: integer;
     FDebugInfoStorage: TDebugInfoStorage;
@@ -80,6 +82,7 @@ begin
   vtreeItems.NodeDataSize := SizeOf(TMyRec);
   // Set an initial number of nodes.
   vtreeItems.RootNodeCount := 0;
+  vtreeItems.AutoExpandDelay:=0;
 end;
 
 procedure TframUnitTreeview.SetDebugInfoStorage(const Value: TDebugInfoStorage);
@@ -89,6 +92,12 @@ begin
   vtreeItems.Clear;
   if Value <> nil then
     vtreeItems.RootNodeCount := Length(FDebugInfoStorage.UnitNames);
+
+  LoadSelectedItemsList;
+end;
+
+procedure TframUnitTreeview.test1Click(Sender: TObject);
+begin
   LoadSelectedItemsList;
 end;
 
@@ -183,8 +192,9 @@ begin
     Data.Caption := '';
 end;
 
-procedure TframUnitTreeview.vtreeItemsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
-    TextType: TVSTTextType; var CellText: UnicodeString);
+procedure TframUnitTreeview.vtreeItemsGetText(Sender: TBaseVirtualTree;
+  Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType;
+  var CellText: string);
 var
   Data: PMyRec;
   ps: PJclMapSegmentExt;
@@ -215,6 +225,8 @@ begin
     else ; end;
   end;
 end;
+
+
 
 procedure TframUnitTreeview.vtreeItemsHeaderClick(Sender: TVTHeader;
       HitInfo: TVTHeaderHitInfo);
@@ -409,6 +421,7 @@ begin
   with vtreeItems do
   for i := low(sa^) to high(sa^) do
   begin
+
     n := vtreeItems.RootNode.FirstChild;
 
     while n <> nil do

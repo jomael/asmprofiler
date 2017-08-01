@@ -465,7 +465,7 @@ begin
   else if aTime >= 0.0001 then
     Result := Format('%8.2fms',[aTime * 1000])
   else if aTime >= 0.0000001 then
-    Result := Format('%8.2fµs',[aTime * 1000 * 1000])
+    Result := Format('%8.2f¦Ìs',[aTime * 1000 * 1000])
   else //if tDiff >= 0.0000001 then
     Result := Format('%8.2fns',[aTime * 1000 * 1000 * 1000])
 end;

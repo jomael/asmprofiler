@@ -35,6 +35,7 @@ object framUnitTreeview: TframUnitTreeview
     OnIncrementalSearch = vtreeItemsIncrementalSearch
     OnInitNode = vtreeItemsInitNode
     OnStateChange = vtreeItemsStateChange
+    ExplicitTop = 2
     Columns = <
       item
         Position = 0
@@ -94,6 +95,10 @@ object framUnitTreeview: TframUnitTreeview
     object SavetoText1: TMenuItem
       Caption = 'Save to CSV'
       OnClick = SavetoText1Click
+    end
+    object test1: TMenuItem
+      Caption = 'test'
+      OnClick = test1Click
     end
   end
 end
