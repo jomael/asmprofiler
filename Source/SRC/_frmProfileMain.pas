@@ -93,7 +93,7 @@ begin
   end;
 
   lblState.Caption := 'Starting...';
-  ProfilerManager.StartProfiling;
+  ProfilerManager.StartProfiling(false);
 
   UpdateEnabledState;
   lblState.Caption := 'Started at: ' + TimeToStr(ProfilerManager.StartTime);

@@ -117,7 +117,7 @@ begin
   begin
     Result := GetSegmentByName(String(aUnit));
     if Result < 0 then
-      Result := AddSegment(String(aUnit));
+      Result := AddSegment(String(aUnit),false);
   end;
 end;
 
@@ -129,7 +129,7 @@ begin
   begin
     iUnitIndex := GetSegmentByName(String(aUnit));
     if iUnitIndex < 0 then
-      iUnitIndex := AddSegment(String(aUnit));
+      iUnitIndex := AddSegment(String(aUnit),False);
     AddCustomFunctionByIndex(iUnitIndex, aProcedure, aFuntionPointer);
   end;
 end;

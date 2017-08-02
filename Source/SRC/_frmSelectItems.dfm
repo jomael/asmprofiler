@@ -62,7 +62,7 @@ object frmSelectItems: TfrmSelectItems
     Top = 0
     Width = 691
     Height = 577
-    ActivePage = tsLoadedDlls
+    ActivePage = TabSheet4
     Align = alTop
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 2
@@ -186,8 +186,6 @@ object frmSelectItems: TfrmSelectItems
     object tsProgramImports: TTabSheet
       Caption = 'Program imports/exports'
       ImageIndex = 5
-      ExplicitTop = 23
-      ExplicitHeight = 550
       object mmoImports: TMemo
         Left = 3
         Top = 40
@@ -269,8 +267,6 @@ object frmSelectItems: TfrmSelectItems
     object tsLoadedDllsOld: TTabSheet
       Caption = 'Loaded dlls (old/raw)'
       ImageIndex = 3
-      ExplicitTop = 23
-      ExplicitHeight = 550
       object btnLoadedModules: TButton
         Left = 3
         Top = 1

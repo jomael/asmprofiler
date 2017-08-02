@@ -57,7 +57,7 @@ uses
   Forms,
   shellapi,
   procs in 'procs.pas',
-  _uAsmProfDllInterface in '..\..\DllVersion\_uAsmProfDllInterface.pas';
+  _uAsmProfDllInterface in '..\..\..\DllVersion\_uAsmProfDllInterface.pas';
 
 type
 
@@ -113,7 +113,8 @@ function InjectDllToTarget(const aDllName, aProcName: string; TargetProcessID: D
  var
   InitDataAddr , WriteAddr : pointer;
   hProcess  , ThreadHandle : Thandle;
-  BytesWritten , TheadID : DWORD;
+  TheadID : DWORD;
+  BytesWritten :NativeUInt;
   InitData : TInjectDllData;
 begin
  result := false;
@@ -223,7 +224,7 @@ begin
  //dll_to_inject := 'wsock.dll'; //just an example, it can be anything
 // dll_to_inject := ExtractFilePath(Application.ExeName) + 'AsmProfiler_inject.dll';
 // dll_to_inject := ExtractFilePath(Application.ExeName) + 'AsmProfiler.dll';
-  dll_to_inject := 'C:\Andre\AsmProfiler\DllVersion\AsmProfiler.dll';
+  dll_to_inject := 'Z:\zhongzhuo\src\asmprfiller\asmprofiler\Releases\AsmProfiler Complete v1.1.6\Instrumenting\AsmProfiler.dll';
 
  {
   for the perous of this demo we will just inject into

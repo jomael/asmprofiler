@@ -17,7 +17,6 @@ type
     SavetoHTML1: TMenuItem;
     SavetoRTF1: TMenuItem;
     SavetoText1: TMenuItem;
-    test1: TMenuItem;
     procedure vtreeItemsChecked(Sender: TBaseVirtualTree;
       Node: PVirtualNode);
     procedure vtreeItemsCompareNodes(Sender: TBaseVirtualTree; Node1,
@@ -40,7 +39,6 @@ type
       Node: PVirtualNode; const SearchText: string; var Result: Integer);
     procedure vtreeItemsGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; TextType: TVSTTextType; var CellText: string);
-    procedure test1Click(Sender: TObject);
   private
     FSelectedItemsCount: integer;
     FDebugInfoStorage: TDebugInfoStorage;
@@ -93,11 +91,6 @@ begin
   if Value <> nil then
     vtreeItems.RootNodeCount := Length(FDebugInfoStorage.UnitNames);
 
-  LoadSelectedItemsList;
-end;
-
-procedure TframUnitTreeview.test1Click(Sender: TObject);
-begin
   LoadSelectedItemsList;
 end;
 

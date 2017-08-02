@@ -9,6 +9,10 @@ uses
   _uAsmProfDllInterface in '_uAsmProfDllInterface.pas',
   _uAsmProfDllLoader in '_uAsmProfDllLoader.pas';
 
+procedure test();
+begin
+  Sleep(10);
+end;
 var i: Integer;
 begin
   Writeln('Trying to load AsmProfiler.dll...');

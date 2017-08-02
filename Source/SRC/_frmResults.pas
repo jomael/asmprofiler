@@ -571,9 +571,9 @@ begin
       sFile := sDir + ExtractFileName(FProfileRun.MapFilename);
 
       if FileExists(sFile) then
-        FMainMapFile.LoadFromFile_Pdbg(sFile)
-      else
-        showmessage('no profiled map file (*.pdbg) found!');
+        FMainMapFile.LoadFromFile_Pdbg(sFile);
+      //else
+        //showmessage('no profiled map file (*.pdbg) found!');
 
       if FProfileRun.MapMemOffset > 0 then
         FMainMapFile.Offset := FProfileRun.MapMemOffset;

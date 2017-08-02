@@ -96,6 +96,7 @@ begin
 
   tsLoadedDllsOld.TabVisible := False;
   tsProgramImports.TabVisible := False;
+  TabSheet4.TabVisible:=False;
 end;
 
 procedure TfrmSelectItems.framLoadedDllsPopupMenu1Popup(Sender: TObject);
