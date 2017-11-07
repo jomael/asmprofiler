@@ -343,7 +343,10 @@ begin
   FBlackListedFunctions.Sorted        := true;
   // TlsGetValue is used in hook procedure and will cause a infinite loop if not blacklisted
   FBlackListedFunctions.Add('TlsGetValue');
+  FBlackListedFunctions.Add('TlsSetValue');
   FBlackListedFunctions.Add('SysInit.TlsGetValue');
+  FBlackListedFunctions.Add('SysInit.TlsSetValue');
+  FBlackListedFunctions.Add('GetCurrentThreadId');
 end;
 
 procedure TProfilerManager.CreateProfileForm;
