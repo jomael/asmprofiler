@@ -130,6 +130,7 @@ type
     FStarted: boolean;
 //    FProfileOverhead: integer;
     FLoadedDllsInfo: TProgramLoadedDllsStorage;
+    FBlackListedFunctions : TStringList;
 
     function GetStarted: boolean;
     function GetStartTime: TDatetime;
@@ -154,6 +155,8 @@ type
 
     procedure CreateProfileIntercepts(const aArray:PSelectedUnitArray; const aOffSet:Cardinal);
     procedure RemoveProfileIntercepts(var aArray:TSelectedUnitArray; const aOffSet:Cardinal);
+
+    function IsBlackListedProc(const procName : string) : boolean;
 
   public
     constructor Create;virtual;
@@ -332,6 +335,15 @@ begin
 
   FFlagStarted := TGpFlag.Create('Global/AsmProfiler/FlagIsStarted');
   FFlagStarted.ClearFlag;
+
+  // Add functions to this list to not profile them
+  // Format: '[UnitName.]FunctionName'
+  FBlackListedFunctions := TStringList.Create();
+  FBlackListedFunctions.CaseSensitive := false;
+  FBlackListedFunctions.Sorted        := true;
+  // TlsGetValue is used in hook procedure and will cause a infinite loop if not blacklisted
+  FBlackListedFunctions.Add('TlsGetValue');
+  FBlackListedFunctions.Add('SysInit.TlsGetValue');
 end;
 
 procedure TProfilerManager.CreateProfileForm;
@@ -380,7 +392,8 @@ begin
                  //(p = @RDTSC) or
                  //(p = @Windows.InterlockedIncrement) or
                  //(p = @Windows.QueryPerformanceCounter) or
-                 (p = nil)
+                 (p = nil) or
+                 IsBlackListedProc(sProc)
                  //( (length(sProc) > 0) and
                  //  (sProc[1] = '@') )
                )
@@ -439,6 +452,8 @@ begin
   FInterceptedProcedures.Free;
 
   FFlagStarted.Free;
+  FBlackListedFunctions.Free();
+
   inherited;
 end;
 
@@ -457,6 +472,12 @@ end;
 function TProfilerManager.GetStartTime: TDatetime;
 begin
   Result := CurrentRun.FProfileStartTime;
+end;
+
+function TProfilerManager.IsBlackListedProc(const procName: string): boolean;
+var dummy : Integer;
+begin
+  Result := FBlackListedFunctions.Find(procName, dummy);
 end;
 
 (*
