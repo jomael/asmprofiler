@@ -304,16 +304,21 @@ begin
           //new level
           if (iLevel = aLevel) and (pta[iProfIndex].ProfileType = ptEnter) then
           begin
-            //create new node
-            if aNode = nil then
-              pNodeRoot := vtreeTrace.AddChild(vtreeTrace.RootNode)
-            //or first empty node
-            else if (aNode.ChildCount = 1) and
-                    (PTraceRecord(vtreeTrace.GetNodeData(aNode.FirstChild)).FunctionName = '') then
-              pNodeRoot := aNode.FirstChild
-            //new child
-            else
+            if aNode = nil then begin
+              //create new node
+              pNodeRoot := vtreeTrace.AddChild(vtreeTrace.RootNode);
+              vtreeTrace.ChildCount[pNodeRoot] := 1;
+            end
+            else if (aNode.ChildCount = 1)
+                 and (PTraceRecord(vtreeTrace.GetNodeData(aNode.FirstChild)).FunctionName = '') then begin
+              //or first empty node
+              pNodeRoot := aNode.FirstChild;
+            end
+            else begin
+              //new child
               pNodeRoot := vtreeTrace.AddChild(aNode);
+            end;
+
             pData := vtreeTrace.GetNodeData(pNodeRoot);
             vtreeTrace.ValidateNode(pNodeRoot, false);
             //set data
@@ -374,6 +379,7 @@ begin
           inc(iProfIndex);
         end;
 
+        iProfIndex := iProfIndex;
       end;
     end;
 

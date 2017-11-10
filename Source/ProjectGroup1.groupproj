@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{6DE850E8-F9DB-4FB1-BD62-EC8CDA542D5D}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="ProfilerResultViewer\ProfilerResultViewer.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="DllVersion\AsmProfiler.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="ProfilerResultViewer">
+        <MSBuild Projects="ProfilerResultViewer\ProfilerResultViewer.dproj"/>
+    </Target>
+    <Target Name="ProfilerResultViewer:Clean">
+        <MSBuild Projects="ProfilerResultViewer\ProfilerResultViewer.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ProfilerResultViewer:Make">
+        <MSBuild Projects="ProfilerResultViewer\ProfilerResultViewer.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="AsmProfiler">
+        <MSBuild Projects="DllVersion\AsmProfiler.dproj"/>
+    </Target>
+    <Target Name="AsmProfiler:Clean">
+        <MSBuild Projects="DllVersion\AsmProfiler.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="AsmProfiler:Make">
+        <MSBuild Projects="DllVersion\AsmProfiler.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="ProfilerResultViewer;AsmProfiler"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="ProfilerResultViewer:Clean;AsmProfiler:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="ProfilerResultViewer:Make;AsmProfiler:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
