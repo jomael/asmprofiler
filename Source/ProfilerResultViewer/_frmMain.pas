@@ -4,22 +4,20 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Mask, VirtualTrees, Buttons, JvToolEdit, JvExMask;
-  //JvExMask;
+  Dialogs, StdCtrls, Mask, VirtualTrees, Buttons;
 
 type
   TfrmMain = class(TForm)
-    edtDir: TJvDirectoryEdit;
     Label1: TLabel;
-    vtTree: TVirtualStringTree;
     btnOpenViewer: TBitBtn;
     lbItems: TListBox;
-    Button1: TButton;
+    edtDir: TEdit;
+    btnBrowseDir: TButton;
     procedure edtDirChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure btnOpenViewerClick(Sender: TObject);
     procedure lbItemsDblClick(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
+    procedure btnBrowseDirClick(Sender: TObject);
   private
     { Private declarations }
     procedure LoadTreeItems(const aDir: string);
@@ -32,8 +30,12 @@ var
 
 implementation
 
-uses JclFileUtils, _frmResults, _uProfilerManager, ShellAPI;
-     //_frmTestImage;
+uses
+  JclFileUtils,
+  _frmResults,
+  _uProfilerManager,
+  Winapi.ShellAPI,
+  Vcl.FileCtrl;
 
 {$R *.dfm}
 
@@ -101,15 +103,6 @@ begin
   end;
 end;
 
-procedure TfrmMain.Button1Click(Sender: TObject);
-begin
-  {
-  frmTestImage := tfrmTestImage.Create(nil);
-  frmTestImage.ShowModal;
-  frmTestImage.Free;
-  }
-end;
-
 procedure TfrmMain.edtDirChange(Sender: TObject);
 begin
   LoadTreeItems(edtDir.Text);
@@ -119,9 +112,8 @@ procedure TfrmMain.LoadTreeItems(const aDir: string);
 var
   str: Tstrings;
 begin
-  vtTree.Clear;
   lbItems.Clear;
-  if not DirectoryExists(aDir) then exit;
+  if not SysUtils.DirectoryExists(aDir) then exit;
 
   str := TStringlist.Create;
   if BuildFileList(aDir, faAnyFile, str, '*.profilerun', True) then
@@ -133,10 +125,19 @@ end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
-  edtDir.InitialDir := ExtractFilePath(Application.ExeName);
-  edtDir.Text       := ExtractFilePath(Application.ExeName);
+  edtDir.Text := ExtractFilePath(Application.ExeName);
+end;
 
-  //shellexecute(0, pchar('open'),'mcfield.pas',nil,nil, SW_SHOWNORMAL);
+procedure TfrmMain.btnBrowseDirClick(Sender: TObject);
+var
+  dir : string;
+begin
+  dir := edtDir.Text;
+
+  if SelectDirectory('Select a folder', '', dir, [sdNewUI], self) then begin
+    edtDir.Text := dir;
+  end;
+
 end;
 
 procedure TfrmMain.btnOpenViewerClick(Sender: TObject);

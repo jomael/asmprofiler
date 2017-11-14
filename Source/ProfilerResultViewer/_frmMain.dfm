@@ -2,8 +2,8 @@ object frmMain: TfrmMain
   Left = 391
   Top = 330
   Caption = 'Profile Result Viewer'
-  ClientHeight = 388
-  ClientWidth = 664
+  ClientHeight = 456
+  ClientWidth = 734
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -14,8 +14,8 @@ object frmMain: TfrmMain
   Position = poScreenCenter
   OnCreate = FormCreate
   DesignSize = (
-    664
-    388)
+    734
+    456)
   PixelsPerInch = 96
   TextHeight = 13
   object Label1: TLabel
@@ -25,64 +25,46 @@ object frmMain: TfrmMain
     Height = 13
     Caption = 'Application dir:'
   end
-  object edtDir: TJvDirectoryEdit
-    Left = 88
-    Top = 8
-    Width = 579
-    Height = 21
-    DialogKind = dkWin32
-    Anchors = [akLeft, akTop, akRight]
-    TabOrder = 0
-    Text = 'edtDir'
-    OnChange = edtDirChange
-  end
-  object vtTree: TVirtualStringTree
-    Left = 8
-    Top = 40
-    Width = 659
-    Height = 315
-    Anchors = [akLeft, akTop, akRight, akBottom]
-    Header.AutoSizeIndex = 0
-    Header.Font.Charset = DEFAULT_CHARSET
-    Header.Font.Color = clWindowText
-    Header.Font.Height = -11
-    Header.Font.Name = 'MS Sans Serif'
-    Header.Font.Style = []
-    Header.MainColumn = -1
-    Header.Options = [hoColumnResize, hoDrag]
-    TabOrder = 1
-    Columns = <>
-  end
   object btnOpenViewer: TBitBtn
     Left = 8
-    Top = 366
+    Top = 423
     Width = 97
     Height = 25
     Anchors = [akLeft, akBottom]
     Caption = 'Open viewer'
-    TabOrder = 2
+    TabOrder = 0
     OnClick = btnOpenViewerClick
   end
   object lbItems: TListBox
     Left = 8
     Top = 40
-    Width = 659
-    Height = 316
+    Width = 718
+    Height = 377
     Anchors = [akLeft, akTop, akRight, akBottom]
     Columns = 1
     ItemHeight = 13
     Sorted = True
-    TabOrder = 3
+    TabOrder = 1
     OnDblClick = lbItemsDblClick
   end
-  object Button1: TButton
-    Left = 589
-    Top = 367
-    Width = 75
+  object edtDir: TEdit
+    Left = 83
+    Top = 8
+    Width = 607
+    Height = 21
+    Anchors = [akLeft, akTop, akRight]
+    TabOrder = 2
+    Text = 'edtDir'
+    OnChange = edtDirChange
+  end
+  object btnBrowseDir: TButton
+    Left = 696
+    Top = 8
+    Width = 30
     Height = 25
-    Caption = 'Button1'
-    TabOrder = 4
-    Visible = False
-    OnClick = Button1Click
+    Anchors = [akTop, akRight]
+    Caption = '...'
+    TabOrder = 3
+    OnClick = btnBrowseDirClick
   end
 end
