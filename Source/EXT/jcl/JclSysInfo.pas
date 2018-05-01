@@ -84,6 +84,7 @@ uses
   {$ENDIF MSWINDOWS}
   Classes,
   {$ENDIF ~HAS_UNITSCOPE}
+  AnsiStrings,
   JclBase, JclResources;
 
 // Environment Variables
@@ -846,7 +847,7 @@ const
   EAMD2_LAHF          = BIT_0;  // LAHF/SAHF available in 64-bit mode
   EAMD2_CMPLEGACY     = BIT_1;  // core multi-processing legacy mode
   EAMD2_SVM           = BIT_2;  // Secure Virtual Machine
-  EAMD2_EXTAPICSPACE  = BIT_3;  // This bit indicates the presence of extended APIC register space starting at offset 400h from the “APIC Base Address Register,” as specified in the BKDG.
+  EAMD2_EXTAPICSPACE  = BIT_3;  // This bit indicates the presence of extended APIC register space starting at offset 400h from the “APIC Base Address Register,?as specified in the BKDG.
   EAMD2_ALTMOVCR8     = BIT_4;  // LOCK MOV CR0 means MOV CR8
   EAMD2_ABM           = BIT_5;  // ABM: Advanced bit manipulation. LZCNT instruction support.
   EAMD2_SSE4A         = BIT_6;  // EXTRQ, INSERTQ, MOVNTSS, and MOVNTSD instruction support.
@@ -3750,7 +3751,7 @@ begin
         begin
           { TODO : Store this information in a Global Variable, and return that??
                    This would save this work being performed again with later calls }
-          sOpenGLVersion := StrPas(pcTemp);
+          sOpenGLVersion := AnsiStrings.StrPas(pcTemp);
         end
         else
         begin
@@ -3768,7 +3769,7 @@ begin
         begin
           { TODO : Store this information in a Global Variable, and return that??
                    This would save this work being performed again with later calls }
-          sOpenGLVendor := StrPas(pcTemp);
+          sOpenGLVendor := AnsiStrings.StrPas(pcTemp);
         end
         else
         begin
@@ -4609,7 +4610,7 @@ function CPUID: TCpuInfo;
             11:
               CPUInfo.CpuName := 'Pentium III';
           else
-            StrPCopy(CPUInfo.CpuName, AnsiString(Format('P6 (Model %d)', [CPUInfo.Model])));
+            AnsiStrings.StrPCopy(CPUInfo.CpuName, AnsiString(Format('P6 (Model %d)', [CPUInfo.Model])));
           end;
         15:
           case CPUInfo.IntelSpecific.BrandID of
@@ -4623,7 +4624,7 @@ function CPUID: TCpuInfo;
             CPUInfo.CpuName := 'Pentium 4';
           end;
       else
-        StrPCopy(CPUInfo.CpuName, AnsiString(Format('P%d', [CPUInfo.Family])));
+        AnsiStrings.StrPCopy(CPUInfo.CpuName, AnsiString(Format('P%d', [CPUInfo.Family])));
       end;
     end;
 
@@ -4746,36 +4747,36 @@ function CPUID: TCpuInfo;
             3:
               CPUInfo.CpuName := 'AMD-K5 (Model 3)';
             6:
-              CPUInfo.CpuName := 'AMD-K6® (Model 6)';
+              CPUInfo.CpuName := 'AMD-K6?(Model 6)';
             7:
-              CPUInfo.CpuName := 'AMD-K6® (Model 7)';
+              CPUInfo.CpuName := 'AMD-K6?(Model 7)';
             8:
-              CPUInfo.CpuName := 'AMD-K6®-2 (Model 8)';
+              CPUInfo.CpuName := 'AMD-K6?2 (Model 8)';
             9:
-              CPUInfo.CpuName := 'AMD-K6®-III (Model 9)';
+              CPUInfo.CpuName := 'AMD-K6?III (Model 9)';
             else
-              StrFmt(CPUInfo.CpuName, PAnsiChar(AnsiString(LoadResString(@RsUnknownAMDModel))),[CPUInfo.Model]);
+              AnsiStrings.StrFmt(CPUInfo.CpuName, PAnsiChar(AnsiString(LoadResString(@RsUnknownAMDModel))),[CPUInfo.Model]);
           end;
         6:
           case CPUInfo.Model of
             1:
-              CPUInfo.CpuName := 'AMD Athlon™ (Model 1)';
+              CPUInfo.CpuName := 'AMD Athlon?(Model 1)';
             2:
-              CPUInfo.CpuName := 'AMD Athlon™ (Model 2)';
+              CPUInfo.CpuName := 'AMD Athlon?(Model 2)';
             3:
-              CPUInfo.CpuName := 'AMD Duron™ (Model 3)';
+              CPUInfo.CpuName := 'AMD Duron?(Model 3)';
             4:
-              CPUInfo.CpuName := 'AMD Athlon™ (Model 4)';
+              CPUInfo.CpuName := 'AMD Athlon?(Model 4)';
             6:
-              CPUInfo.CpuName := 'AMD Athlon™ XP (Model 6)';
+              CPUInfo.CpuName := 'AMD Athlon?XP (Model 6)';
             7:
-              CPUInfo.CpuName := 'AMD Duron™ (Model 7)';
+              CPUInfo.CpuName := 'AMD Duron?(Model 7)';
             8:
-              CPUInfo.CpuName := 'AMD Athlon™ XP (Model 8)';
+              CPUInfo.CpuName := 'AMD Athlon?XP (Model 8)';
             10:
-              CPUInfo.CpuName := 'AMD Athlon™ XP (Model 10)';
+              CPUInfo.CpuName := 'AMD Athlon?XP (Model 10)';
             else
-              StrFmt(CPUInfo.CpuName, PAnsiChar(AnsiString(LoadResString(@RsUnknownAMDModel))), [CPUInfo.Model]);
+              AnsiStrings.StrFmt(CPUInfo.CpuName, PAnsiChar(AnsiString(LoadResString(@RsUnknownAMDModel))), [CPUInfo.Model]);
           end;
         8:
 
@@ -4859,7 +4860,7 @@ function CPUID: TCpuInfo;
         6:
           CPUInfo.CpuName := '6x86MX';
       else
-        StrPCopy(CPUInfo.CpuName, AnsiString(Format('%dx86', [CPUInfo.Family])));
+        AnsiStrings.StrPCopy(CPUInfo.CpuName, AnsiString(Format('%dx86', [CPUInfo.Family])));
       end;
     end;
   end;

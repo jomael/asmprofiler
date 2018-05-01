@@ -1,5 +1,9 @@
  library AsmProfiler;
-
+ { Reduce EXE size by disabling as much of RTTI as possible (delphi 2009/2010) }
+{$IF CompilerVersion >= 21.0}
+{$WEAKLINKRTTI ON}
+{$RTTI EXPLICIT METHODS([]) PROPERTIES([]) FIELDS([])}
+{$IFEND}
 uses
   SysUtils,
   Classes,
@@ -23,7 +27,8 @@ uses
   _uRemoteControlThread in '..\SRC\_uRemoteControlThread.pas',
   _framProfileTraceTree in '..\SRC\_framProfileTraceTree.pas' {framProfileTraceTree: TFrame},
   _frmCallChart in '..\ProfilerResultViewer\_frmCallChart.pas' {frmCallChart},
-  _uAsmProfDllInterface in '_uAsmProfDllInterface.pas';
+  _uAsmProfDllInterface in '_uAsmProfDllInterface.pas',
+  GpLists in '..\SRC\GpLists.pas';
 
 {$E .dll}
 {$R *.res}

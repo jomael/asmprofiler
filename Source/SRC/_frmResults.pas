@@ -8,7 +8,8 @@ uses
   //_frmProfileMain,
   _uProfilerManager, GpLists,
   Buttons, ComCtrls, VirtualTrees, _framProfileResultTree,
-  ExtCtrls, contnrs, _framProfileTraceTree, TeEngine, Series, TeeProcs, Chart, Menus, ImgList;
+  ExtCtrls, contnrs, _framProfileTraceTree, TeEngine, Series, TeeProcs, Chart, Menus, ImgList,
+  VclTee.TeeGDIPlus, System.ImageList;
 
   { TODO : 'TODO: Last 1024 value graph'}
   { TODO : 'Total thread cpu usage (kernel, user), incl total cpu time duration'}
@@ -570,9 +571,9 @@ begin
       sFile := sDir + ExtractFileName(FProfileRun.MapFilename);
 
       if FileExists(sFile) then
-        FMainMapFile.LoadFromFile_Pdbg(sFile)
-      else
-        showmessage('no profiled map file (*.pdbg) found!');
+        FMainMapFile.LoadFromFile_Pdbg(sFile);
+      //else
+        //showmessage('no profiled map file (*.pdbg) found!');
 
       if FProfileRun.MapMemOffset > 0 then
         FMainMapFile.Offset := FProfileRun.MapMemOffset;

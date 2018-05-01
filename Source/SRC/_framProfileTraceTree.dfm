@@ -10,7 +10,6 @@ object framProfileTraceTree: TframProfileTraceTree
     Width = 781
     Height = 635
     Align = alClient
-    CheckImageKind = ckDarkCheck
     DefaultNodeHeight = 14
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -24,6 +23,7 @@ object framProfileTraceTree: TframProfileTraceTree
     Header.Font.Height = -11
     Header.Font.Name = 'MS Sans Serif'
     Header.Font.Style = []
+    Header.Height = 17
     Header.Options = [hoColumnResize, hoDrag, hoVisible]
     Header.SortDirection = sdDescending
     IncrementalSearch = isAll

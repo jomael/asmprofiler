@@ -37,11 +37,17 @@ type
     lbModules: TListBox;
     tsLoadedDlls: TTabSheet;
     framLoadedDlls: TframUnitTreeview;
+    N1: TMenuItem;
+    N_OnlyWithMapFile: TMenuItem;
+    N_NoSystemFunc: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
     procedure btnLoadProgramImportExportClick(Sender: TObject);
     procedure btnLoadedModulesClick(Sender: TObject);
     procedure lbModulesClick(Sender: TObject);
+    procedure N_OnlyWithMapFileClick(Sender: TObject);
+    procedure framLoadedDllsPopupMenu1Popup(Sender: TObject);
+    procedure N_NoSystemFuncClick(Sender: TObject);
   private
     //FSelectedItemsCount: integer;
     //FCustomItemsCount: integer;
@@ -49,6 +55,8 @@ type
     FInternalDebugInfo: TDebugInfoStorage;
     FCustomDebugInfo: TDebugInfoStorage;
     FLoadedDllsInfo: TProgramLoadedDllsStorage;
+
+    FOnlyWithMapFile:Boolean;
     procedure SetMapFileLoader(const Value: TMapFileLoader);
     procedure SetCustomDebugInfo(const Value: TDebugInfoStorage);
     procedure SetInternalDebugInfo(const Value: TDebugInfoStorage);
@@ -84,9 +92,18 @@ end;
 procedure TfrmSelectItems.FormCreate(Sender: TObject);
 begin
   pgMain.ActivePageIndex := 0;
+  FOnlyWithMapFile:=True;
 
   tsLoadedDllsOld.TabVisible := False;
   tsProgramImports.TabVisible := False;
+  TabSheet4.TabVisible:=False;
+end;
+
+procedure TfrmSelectItems.framLoadedDllsPopupMenu1Popup(Sender: TObject);
+begin
+ N_OnlyWithMapFile.Checked:=self.LoadedDllsInfo.OnlyWithMap;
+ N_NoSystemFunc.Checked:=self.LoadedDllsInfo.NoSystemUnit;
+
 end;
 
 procedure TfrmSelectItems.lbModulesClick(Sender: TObject);
@@ -109,6 +126,20 @@ begin
   mmoModuleImportExports.Lines.AddStrings(str);
 
   str.free;
+end;
+
+procedure TfrmSelectItems.N_NoSystemFuncClick(Sender: TObject);
+begin
+  self.LoadedDllsInfo.NoSystemUnit:=(sender as TMenuItem).Checked;
+  self.SetLoadedDllsInfo(self.LoadedDllsInfo);
+end;
+
+procedure TfrmSelectItems.N_OnlyWithMapFileClick(Sender: TObject);
+begin
+   self.LoadedDllsInfo.OnlyWithMap :=(sender as TMenuItem).Checked;
+
+   self.SetLoadedDllsInfo(self.LoadedDllsInfo);
+
 end;
 
 procedure TfrmSelectItems.btnLoadedModulesClick(Sender: TObject);

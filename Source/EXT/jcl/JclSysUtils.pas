@@ -2288,7 +2288,7 @@ begin
   FSignChars[False] := '-';
   FSignChars[True] := '+';
   FPaddingChar := ' ';
-  FMultiplier := '×';
+  FMultiplier := '*';
   FFractionalPartSeparator := JclFormatSettings.DecimalSeparator;
   FDigitBlockSeparator := JclFormatSettings.ThousandSeparator;
 end;
@@ -2937,7 +2937,7 @@ begin
       end;
       if AbortPtr^ then
         TerminateProcess(ProcessEvent.Handle, Cardinal(ABORT_EXIT_CODE));
-      if (ProcessEvent.WaitForever = wrSignaled) and not GetExitCodeProcess(ProcessEvent.Handle, Result) then
+      if (ProcessEvent.WaitForever =Tjclwaitresult( wrSignaled)) and not GetExitCodeProcess(ProcessEvent.Handle, Result) then
         Result := $FFFFFFFF;
       CloseHandle(ProcessInfo.hThread);
       ProcessInfo.hThread := 0;

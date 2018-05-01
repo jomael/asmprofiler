@@ -29,7 +29,7 @@ it explains the basics of how method 2 works
 You must understand how method 1 works before reading this....
 
 
-Here comes the trick – have a look at the signature of thread function,
+Here comes the trick ?have a look at the signature of thread function,
 whose pointer is passed as parameter
 (i.e. LPTHREAD_START_ROUTINE) to the CreateRemoteThread():
 

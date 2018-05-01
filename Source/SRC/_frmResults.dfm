@@ -140,7 +140,7 @@ object frmResults: TfrmResults
         Margins.Top = 4
         Margins.Right = 0
         Margins.Bottom = 0
-        ActivePage = tsTraceTree
+        ActivePage = tsFunctionOverview
         Align = alClient
         Images = ImageList1
         Style = tsFlatButtons
@@ -155,7 +155,6 @@ object frmResults: TfrmResults
             Width = 973
             Height = 586
             Align = alClient
-            CheckImageKind = ckDarkCheck
             DefaultNodeHeight = 14
             Header.AutoSizeIndex = 0
             Header.DefaultHeight = 17
@@ -164,6 +163,7 @@ object frmResults: TfrmResults
             Header.Font.Height = -11
             Header.Font.Name = 'MS Sans Serif'
             Header.Font.Style = []
+            Header.Height = 17
             Header.Options = [hoColumnResize, hoDrag, hoVisible]
             Header.SortDirection = sdDescending
             IncrementalSearch = isAll
@@ -288,6 +288,7 @@ object frmResults: TfrmResults
             Font.Style = [fsBold]
             ParentFont = False
             Transparent = False
+            ExplicitWidth = 58
           end
           inline framProfileResultTree1: TframProfileResultTree
             Left = 0
@@ -296,12 +297,17 @@ object frmResults: TfrmResults
             Height = 248
             Align = alClient
             TabOrder = 0
+            ExplicitTop = 13
+            ExplicitWidth = 973
+            ExplicitHeight = 248
             inherited vtreeUnit: TVirtualStringTree
               Width = 973
               Height = 248
               Font.Name = 'MS Sans Serif'
               OnChange = framProfileResultTree1vtreeUnitChange
               OnDblClick = framProfileResultTree1vtreeUnitDblClick
+              ExplicitWidth = 973
+              ExplicitHeight = 248
               Columns = <
                 item
                   Color = 15921906
@@ -433,11 +439,17 @@ object frmResults: TfrmResults
                 Font.Style = []
                 ParentFont = False
                 TabOrder = 0
+                ExplicitLeft = 2
+                ExplicitTop = 15
+                ExplicitWidth = 969
+                ExplicitHeight = 88
                 inherited vtreeUnit: TVirtualStringTree
                   Width = 969
                   Height = 88
                   Font.Name = 'MS Sans Serif'
                   OnDblClick = framProfileResultParentsvtreeUnitDblClick
+                  ExplicitWidth = 969
+                  ExplicitHeight = 88
                   Columns = <
                     item
                       Color = 15921906
@@ -562,10 +574,16 @@ object frmResults: TfrmResults
                   Font.Style = []
                   ParentFont = False
                   TabOrder = 0
+                  ExplicitLeft = 2
+                  ExplicitTop = 15
+                  ExplicitWidth = 969
+                  ExplicitHeight = 97
                   inherited vtreeUnit: TVirtualStringTree
                     Width = 969
                     Height = 97
                     Font.Name = 'MS Sans Serif'
+                    ExplicitWidth = 969
+                    ExplicitHeight = 97
                     Columns = <
                       item
                         Color = 15921906
@@ -1050,20 +1068,18 @@ object frmResults: TfrmResults
                   ParentColor = True
                   TabOrder = 15
                   Anchors = [akLeft, akTop, akRight, akBottom]
+                  DefaultCanvas = 'TGDIPlusCanvas'
                   PrintMargins = (
                     15
                     41
                     15
                     41)
+                  ColorPaletteIndex = 13
                   object OwnTimeSeries: TBarSeries
-                    Marks.Arrow.Visible = True
-                    Marks.Callout.Brush.Color = clBlack
-                    Marks.Callout.Arrow.Visible = True
                     Marks.Visible = False
                     SeriesColor = 4259584
                     Title = 'Own time'
                     BarWidthPercent = 95
-                    Gradient.Direction = gdTopBottom
                     MultiBar = mbStacked
                     XValues.Name = 'X'
                     XValues.Order = loAscending
@@ -1071,14 +1087,10 @@ object frmResults: TfrmResults
                     YValues.Order = loNone
                   end
                   object ChildTimeSeries: TBarSeries
-                    Marks.Arrow.Visible = True
-                    Marks.Callout.Brush.Color = clBlack
-                    Marks.Callout.Arrow.Visible = True
                     Marks.Visible = False
                     SeriesColor = 4227327
                     Title = 'Child time'
                     BarWidthPercent = 95
-                    Gradient.Direction = gdTopBottom
                     MultiBar = mbStacked
                     XValues.Name = 'X'
                     XValues.Order = loAscending
@@ -1100,15 +1112,23 @@ object frmResults: TfrmResults
             Height = 586
             Align = alClient
             TabOrder = 0
+            ExplicitWidth = 973
+            ExplicitHeight = 586
             inherited vtreeTrace: TVirtualStringTree
               Width = 973
               Height = 586
+              ExplicitWidth = 973
+              ExplicitHeight = 586
             end
           end
         end
         object tsText: TTabSheet
           Caption = 'Text'
           ImageIndex = -1
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object mmoProfileTimes: TMemo
             Left = 0
             Top = 0
@@ -1131,6 +1151,10 @@ object frmResults: TfrmResults
         object tsCompleteTraceText: TTabSheet
           Caption = 'Complete trace'
           ImageIndex = 3
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object mmoResults: TMemo
             Left = 0
             Top = 31
@@ -1171,6 +1195,10 @@ object frmResults: TfrmResults
         object tsInfo: TTabSheet
           Caption = 'Info'
           ImageIndex = 4
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object mmoInfoThread: TMemo
             Left = 0
             Top = 0
@@ -1193,6 +1221,10 @@ object frmResults: TfrmResults
         object TabSheet1: TTabSheet
           Caption = 'Errors && Warnings'
           ImageIndex = 6
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object mmoErrorsAndWarnings: TMemo
             Left = 0
             Top = 0
@@ -1217,6 +1249,10 @@ object frmResults: TfrmResults
     object TabSheet7: TTabSheet
       Caption = 'Info'
       ImageIndex = -1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object mmoInfo: TMemo
         Left = 0
         Top = 0
@@ -1272,7 +1308,7 @@ object frmResults: TfrmResults
     Left = 344
     Top = 216
     Bitmap = {
-      494C010103000500040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010103001400140010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000B54D0800BD652100BD590800B5510800B5510800B55508000000
